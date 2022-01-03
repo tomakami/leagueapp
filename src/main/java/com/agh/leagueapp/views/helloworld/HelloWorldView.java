@@ -25,9 +25,12 @@ public class HelloWorldView extends HorizontalLayout {
         });
 
         setMargin(true);
-        setVerticalComponentAlignment(Alignment.END, name, sayHello);
+        setAlignItems(Alignment.AUTO);
+        setJustifyContentMode(JustifyContentMode.CENTER);
+        setVerticalComponentAlignment(Alignment.CENTER, name, sayHello);
 
         add(name, sayHello);
+
     }
 
 }

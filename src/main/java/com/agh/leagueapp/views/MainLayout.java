@@ -2,157 +2,96 @@ package com.agh.leagueapp.views;
 
 import com.agh.leagueapp.views.about.AboutView;
 import com.agh.leagueapp.views.helloworld.HelloWorldView;
+import com.agh.leagueapp.views.tournamentlist.TournamentListView;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Header;
-import com.vaadin.flow.component.html.ListItem;
-import com.vaadin.flow.component.html.Nav;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.TabVariant;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * The main view is a top-level placeholder for other views.
- */
 @PWA(name = "LeagueTournamentApp", shortName = "LeagueTournamentApp", enableInstallPrompt = false)
 @Theme(themeFolder = "leaguetournamentapp")
-@PageTitle("Main")
+@PageTitle("LeagueTournamentApp")
 public class MainLayout extends AppLayout {
 
-    public static class MenuItemInfo {
-
-        private String text;
-        private String iconClass;
-        private Class<? extends Component> view;
-
-        public MenuItemInfo(String text, String iconClass, Class<? extends Component> view) {
-            this.text = text;
-            this.iconClass = iconClass;
-            this.view = view;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public String getIconClass() {
-            return iconClass;
-        }
-
-        public Class<? extends Component> getView() {
-            return view;
-        }
-
-    }
-
-    private H1 viewTitle;
+    private final Tabs menu;
 
     public MainLayout() {
-        setPrimarySection(Section.DRAWER);
-        addToNavbar(true, createHeaderContent());
-        addToDrawer(createDrawerContent());
-    }
 
-    private Component createHeaderContent() {
-        DrawerToggle toggle = new DrawerToggle();
-        toggle.addClassName("text-secondary");
-        toggle.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
-        toggle.getElement().setAttribute("aria-label", "Menu toggle");
+        this.setDrawerOpened(false);
+        menu = createMenuTabs();
+        FlexLayout centeredMenu = new FlexLayout();
+        centeredMenu.setSizeFull();
+        centeredMenu.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        centeredMenu.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        viewTitle = new H1();
-        viewTitle.addClassNames("m-0", "text-l");
+        centeredMenu.add(menu);
 
-        Header header = new Header(toggle, viewTitle);
-        header.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border", "flex", "h-xl", "items-center",
-                "w-full");
-        return header;
-    }
+        this.addToNavbar(true, centeredMenu);
 
-    private Component createDrawerContent() {
-        H2 appName = new H2("LeagueTournamentApp");
-        appName.addClassNames("flex", "items-center", "h-xl", "m-0", "px-m", "text-m");
-
-        com.vaadin.flow.component.html.Section section = new com.vaadin.flow.component.html.Section(appName,
-                createNavigation(), createFooter());
-        section.addClassNames("flex", "flex-col", "items-stretch", "max-h-full", "min-h-full");
-        return section;
-    }
-
-    private Nav createNavigation() {
-        Nav nav = new Nav();
-        nav.addClassNames("border-b", "border-contrast-10", "flex-grow", "overflow-auto");
-        nav.getElement().setAttribute("aria-labelledby", "views");
-
-        // Wrap the links in a list; improves accessibility
-        UnorderedList list = new UnorderedList();
-        list.addClassNames("list-none", "m-0", "p-0");
-        nav.add(list);
-
-        for (RouterLink link : createLinks()) {
-            ListItem item = new ListItem(link);
-            list.add(item);
-        }
-        return nav;
-    }
-
-    private List<RouterLink> createLinks() {
-        MenuItemInfo[] menuItems = new MenuItemInfo[]{ //
-                new MenuItemInfo("Hello World", "la la-globe", HelloWorldView.class), //
-
-                new MenuItemInfo("About", "la la-file", AboutView.class), //
-
-        };
-        List<RouterLink> links = new ArrayList<>();
-        for (MenuItemInfo menuItemInfo : menuItems) {
-            links.add(createLink(menuItemInfo));
-
-        }
-        return links;
-    }
-
-    private static RouterLink createLink(MenuItemInfo menuItemInfo) {
-        RouterLink link = new RouterLink();
-        link.addClassNames("flex", "mx-s", "p-s", "relative", "text-secondary");
-        link.setRoute(menuItemInfo.getView());
-
-        Span icon = new Span();
-        icon.addClassNames("me-s", "text-l");
-        if (!menuItemInfo.getIconClass().isEmpty()) {
-            icon.addClassNames(menuItemInfo.getIconClass());
-        }
-
-        Span text = new Span(menuItemInfo.getText());
-        text.addClassNames("font-medium", "text-s");
-
-        link.add(icon, text);
-        return link;
-    }
-
-    private Footer createFooter() {
-        Footer layout = new Footer();
-        layout.addClassNames("flex", "items-center", "my-s", "px-m", "py-xs");
-
-        return layout;
     }
 
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
-        viewTitle.setText(getCurrentPageTitle());
+        RouteConfiguration configuration = RouteConfiguration.forSessionScope();
+        if (configuration.isRouteRegistered(this.getContent().getClass())) {
+            String target = configuration.getUrl(this.getContent().getClass());
+            Optional< Component > tabToSelect = menu.getChildren().filter(tab -> {
+                Component child = tab.getChildren().findFirst().get();
+                return child instanceof RouterLink && ((RouterLink) child).getHref().equals(target);
+            }).findFirst();
+            tabToSelect.ifPresent(tab -> menu.setSelectedTab((Tab) tab));
+        } else {
+            menu.setSelectedTab(null);
+        }
     }
 
-    private String getCurrentPageTitle() {
-        PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
-        return title == null ? "" : title.value();
+    private static Tabs createMenuTabs() {
+        final Tabs tabs = new Tabs();
+        tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
+        tabs.add(getAvailableTabs());
+        return tabs;
+    }
+
+    private static Tab[] getAvailableTabs() {
+        final List<Tab> tabs = new ArrayList<>();
+        System.out.println("Adding tournaments tab");
+        tabs.add(createTab(VaadinIcon.EDIT, "Tournaments", TournamentListView.class));
+        System.out.println("Adding teams tab");
+        tabs.add(createTab(VaadinIcon.CLOCK,"Teams", HelloWorldView.class));
+        System.out.println("Adding players tab");
+        tabs.add(createTab(VaadinIcon.USER,"Players", AboutView.class));
+
+        return tabs.toArray(new Tab[tabs.size()]);
+    }
+
+    private static Tab createTab(VaadinIcon icon, String title, Class<? extends Component> viewClass) {
+        return createTab(populateLink(new RouterLink(null, viewClass), icon, title));
+    }
+
+    private static Tab createTab(Component content) {
+        final Tab tab = new Tab();
+        tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+        tab.add(content);
+        return tab;
+    }
+
+    private static <T extends HasComponents> T populateLink(T a, VaadinIcon icon, String title) {
+        a.add(icon.create());
+        a.add(title);
+        return a;
     }
 }
