@@ -22,8 +22,11 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 @PageTitle("Team List")
 @Route(value = "team-list", layout = MainLayout.class)
@@ -57,15 +60,34 @@ public class AllTeamsView extends VerticalLayout {
 
         grid.addColumn(TeamEntity::getTeamId).setHeader("ID")
                 .setWidth("3em").setFlexGrow(0);
-        grid.addColumn(TeamEntity::getTeamTag).setHeader("Tag")
-                .setWidth("5em").setFlexGrow(0);
-        grid.addColumn(TeamEntity::getTeamName).setHeader("Team Name")
-                .setWidth("20em").setFlexGrow(0);
+
 
         grid.addColumn(
                 new ComponentRenderer<>(Paragraph::new, (p, team) -> {
-                    p.setText(
-                            String.valueOf(dbService.getPlayerRepository().countPlayerEntitiesByTeamId(team.getTeamId())));
+                    Optional<TournamentEntity> entity = dbService.getTournamentRepository().findById(team.getTournamentId());
+
+                    p.setText(entity.isPresent() ? entity.get().getTournamentName() : "Tournament not found.");
+                }
+                )).setHeader("Tournament Name")
+                .setWidth("15em").setFlexGrow(0);
+
+        grid.addColumn(TeamEntity::getTeamTag).setHeader("Tag")
+                .setWidth("5em").setFlexGrow(0);
+        grid.addColumn(TeamEntity::getTeamName).setHeader("Team Name")
+                .setWidth("17em").setFlexGrow(0);
+        grid.addColumn(TeamEntity::getMailAddress).setHeader("Email")
+                        .setAutoWidth(true);
+
+        grid.addColumn(
+                new ComponentRenderer<>(Paragraph::new, (p, team) -> {
+                    String temp;
+                    try{
+                        temp = String.valueOf(dbService.getPlayerRepository().countPlayerEntitiesByTeamId(team.getTeamId()));
+                    }catch(Exception e){
+                        temp = "";
+                    }
+                    p.setText(temp);
+
                 }
                 )).setHeader("Players")
                 .setWidth("5em").setFlexGrow(0);
@@ -83,7 +105,12 @@ public class AllTeamsView extends VerticalLayout {
                     Button edit = new Button();
                     edit.addThemeVariants(ButtonVariant.LUMO_ICON,
                             ButtonVariant.LUMO_TERTIARY);
-                    edit.addClickListener(e -> Notification.show("Edit " + team.getTeamName()));
+                    edit.addClickListener(e ->{
+                        Notification.show("Edit " + team.getTeamName());
+                        Dialog dialog = new TeamDetails(dbService.getTournamentRepository(), dbService.getTeamRepository(),team).getDialog();
+                        add(dialog);
+                        dialog.open();
+                    });
                     edit.setIcon(new Icon(VaadinIcon.EDIT));
                     edit.setWidth("2ep");
 

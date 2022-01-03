@@ -1,7 +1,6 @@
 package com.agh.leagueapp.views.tournamentlist;
 
 import com.agh.leagueapp.backend.entities.TournamentEntity;
-import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.backend.repositories.TournamentRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -69,6 +68,7 @@ public class TournamentDetails extends FormLayout {
 
     private void Bind(){
         binder.setBean(tournament);
+        binder.setValidatorsDisabled(false);
 
         binder.forField(tournamentName)
                 .asRequired("Tournament name is required")
@@ -104,6 +104,7 @@ public class TournamentDetails extends FormLayout {
     }
 
     private void CancelAction(){
+        binder.setValidatorsDisabled(true);
         dialog.close();
         tournamentName.clear();
         regionSelect.clear();
@@ -115,7 +116,7 @@ public class TournamentDetails extends FormLayout {
         try{
             tournamentRepository.delete(binder.getBean());
         }catch (Exception e) {
-            Notification.show("Error occured during deleting from database.", 3, Notification.Position.MIDDLE).open();
+            Notification.show("Error occurred during deleting from database.", 3, Notification.Position.MIDDLE).open();
         }
         CancelAction();
     }

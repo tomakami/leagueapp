@@ -18,6 +18,7 @@ import com.vaadin.flow.data.binder.Setter;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.data.validator.BeanValidator;
+import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.function.ValueProvider;
@@ -26,6 +27,7 @@ import no.stelar7.api.r4j.basic.constants.api.regions.LeagueShard;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TeamDetails extends FormLayout {
 
@@ -65,11 +67,10 @@ public class TeamDetails extends FormLayout {
         tournament.setItemLabelGenerator(TournamentEntity::getTournamentName);
         tournament.setEmptySelectionAllowed(false);
 
-        tournament.addValueChangeListener(click -> {
-            region.setValue(tournament.getValue().getRegion().prettyName());
-        });
+        tournament.addValueChangeListener(click -> region.setValue(tournament.getValue().getRegion().prettyName()));
 
         region.setReadOnly(true);
+        if (isEditing) tournament.setEnabled(false);
 
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickListener(buttonClickEvent -> SaveAction());
@@ -77,7 +78,7 @@ public class TeamDetails extends FormLayout {
         cancel.addClickListener(buttonClickEvent -> CancelAction());
 
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        //delete.addClickListener(buttonClickEvent -> DeleteAction());
+        delete.addClickListener(buttonClickEvent -> DeleteAction());
 
         this.add(teamName, teamTag, tournament, region, mailAddress, save, cancel);
         if (isEditing) this.add(delete);
@@ -89,6 +90,7 @@ public class TeamDetails extends FormLayout {
 
     private void Bind(){
         binder.setBean(team);
+        binder.setValidatorsDisabled(false);
 
 
         binder.forField(teamName)
@@ -120,16 +122,20 @@ public class TeamDetails extends FormLayout {
                     }
                     @Override
                     public TournamentEntity convertToPresentation(Integer tournamentId, ValueContext valueContext) {
-                        try {
-                            return tournamentRepository.getOne(tournamentId);
-                        }catch (Exception e){
-                            return null;
-                        }
+                        if(tournamentId == null) return null;
+                        return tournamentRepository.findById(tournamentId).orElse(null);
                     }
                 })
                 .bind(
                         TeamEntity::getTournamentId,
                         TeamEntity::setTournamentId
+                );
+
+        binder.forField(mailAddress)
+                .withValidator(new EmailValidator("Enter valid email address"))
+                .bind(
+                        TeamEntity::getMailAddress,
+                        TeamEntity::setMailAddress
                 );
     }
 
@@ -145,12 +151,23 @@ public class TeamDetails extends FormLayout {
     }
 
     private void CancelAction(){
+        binder.setValidatorsDisabled(true);
         dialog.close();
         teamName.clear();
         region.clear();
         teamTag.clear();
         mailAddress.clear();
         tournament.clear();
+    }
+
+    private void DeleteAction() {
+        // TODO: ask for confirmation before delete
+        try{
+            teamRepository.delete(binder.getBean());
+        }catch (Exception e) {
+            Notification.show("Error occurred during deleting from database.", 3, Notification.Position.MIDDLE).open();
+        }
+        CancelAction();
     }
 
     public Dialog getDialog(){
