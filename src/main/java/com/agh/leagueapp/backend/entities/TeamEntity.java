@@ -18,6 +18,7 @@ public class TeamEntity {
     private Collection<PlayerEntity> playersByTeamId;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "team_id", nullable = false)
     public Integer getTeamId() {
         return teamId;

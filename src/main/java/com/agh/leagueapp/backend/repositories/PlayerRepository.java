@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlayerRepository extends JpaRepository<PlayerEntity, Integer> {
+
+    long countPlayerEntitiesByTeamId(Integer teamId);
 }

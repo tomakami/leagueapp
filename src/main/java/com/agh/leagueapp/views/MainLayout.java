@@ -1,6 +1,7 @@
 package com.agh.leagueapp.views;
 
 import com.agh.leagueapp.views.about.AboutView;
+import com.agh.leagueapp.views.allteams.AllTeamsView;
 import com.agh.leagueapp.views.helloworld.HelloWorldView;
 import com.agh.leagueapp.views.tournamentlist.TournamentListView;
 import com.vaadin.flow.component.Component;
@@ -68,12 +69,9 @@ public class MainLayout extends AppLayout {
 
     private static Tab[] getAvailableTabs() {
         final List<Tab> tabs = new ArrayList<>();
-        System.out.println("Adding tournaments tab");
         tabs.add(createTab(VaadinIcon.EDIT, "Tournaments", TournamentListView.class));
-        System.out.println("Adding teams tab");
-        tabs.add(createTab(VaadinIcon.CLOCK,"Teams", HelloWorldView.class));
-        System.out.println("Adding players tab");
-        tabs.add(createTab(VaadinIcon.USER,"Players", AboutView.class));
+        tabs.add(createTab(VaadinIcon.CLOCK,"Teams", AllTeamsView.class));
+        tabs.add(createTab(VaadinIcon.USER,"Players", HelloWorldView.class));
 
         return tabs.toArray(new Tab[tabs.size()]);
     }
