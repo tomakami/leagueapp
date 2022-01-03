@@ -13,7 +13,8 @@ public class TournamentEntity {
     private String comment;
     private String api_id;
     private LeagueShard region;
-    private String providerUrl;
+    private String provider_url;
+    private Integer team_size;
     private Collection<GroupEntity> groupsByTournamentId;
 
     @Id
@@ -72,13 +73,23 @@ public class TournamentEntity {
     }
 
     @Basic
-    @Column(name = "providerUrl", nullable = true, length = -1)
+    @Column(name = "provider_url", nullable = true, length = -1)
     public String getProviderUrl() {
-        return providerUrl;
+        return provider_url;
     }
 
     public void setProviderUrl(String providerUrl) {
-        this.providerUrl = providerUrl;
+        this.provider_url = providerUrl;
+    }
+
+    @Basic
+    @Column(name = "team_size", nullable = true, length = -1)
+    public Integer getTeamSize() {
+        return team_size;
+    }
+
+    public void setTeamSize(Integer team_size) {
+        this.team_size = team_size;
     }
 
     @Override
