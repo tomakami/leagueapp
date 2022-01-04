@@ -90,7 +90,6 @@ public class TeamDetails extends FormLayout {
 
     private void Bind(){
         binder.setBean(team);
-        binder.setValidatorsDisabled(false);
 
 
         binder.forField(teamName)
@@ -151,7 +150,6 @@ public class TeamDetails extends FormLayout {
     }
 
     private void CancelAction(){
-        binder.setValidatorsDisabled(true);
         dialog.close();
         teamName.clear();
         region.clear();

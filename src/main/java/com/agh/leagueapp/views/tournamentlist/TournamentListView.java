@@ -11,7 +11,6 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -19,7 +18,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.function.SerializableSupplier;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -117,11 +115,11 @@ public class TournamentListView extends VerticalLayout {
         Icon plusIcon = VaadinIcon.PLUS.create();
         newTournament.setIcon(plusIcon);
 
-        Dialog dialog = new TournamentDetails(dbService.getTournamentRepository(), null).getDialog();
-        add(dialog);
-
         newTournament.addClickListener(buttonClickEvent -> {
-                dialog.open();
+            TournamentDetails details = new TournamentDetails(dbService.getTournamentRepository(), null);
+            Dialog dialog = details.getDialog();
+            add(dialog);
+            dialog.open();
         });
 
         return newTournament;
@@ -134,9 +132,10 @@ public class TournamentListView extends VerticalLayout {
         Icon refreshIcon = VaadinIcon.REFRESH.create();
         refresh.setIcon(refreshIcon);
 
-        refresh.addClickListener(buttonClickEvent -> {
-            grid.setDataProvider(new ListDataProvider<>(FetchTournamentList()));
-        });
+        refresh.addClickListener(
+                buttonClickEvent ->
+                        grid.setDataProvider
+                                (new ListDataProvider<>(FetchTournamentList())));
 
         return refresh;
     }

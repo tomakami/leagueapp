@@ -14,6 +14,7 @@ public class TournamentEntity {
     private String api_id;
     private LeagueShard region;
     private String provider_url;
+    private Integer provider_id;
     private Integer team_size;
     private Collection<GroupEntity> groupsByTournamentId;
 
@@ -80,6 +81,16 @@ public class TournamentEntity {
 
     public void setProviderUrl(String providerUrl) {
         this.provider_url = providerUrl;
+    }
+
+    @Basic
+    @Column(name = "provider_id", nullable = true, length = -1)
+    public Integer getProviderId() {
+        return provider_id;
+    }
+
+    public void setProviderId(Integer provider_id) {
+        this.provider_id = provider_id;
     }
 
     @Basic

@@ -138,10 +138,10 @@ public class AllTeamsView extends VerticalLayout {
         Icon plusIcon = VaadinIcon.PLUS.create();
         newTeam.setIcon(plusIcon);
 
-        Dialog dialog = new TeamDetails(dbService.getTournamentRepository(), dbService.getTeamRepository(),null).getDialog();
-        add(dialog);
-
         newTeam.addClickListener(buttonClickEvent -> {
+                TeamDetails details = new TeamDetails(dbService.getTournamentRepository(), dbService.getTeamRepository(),null);
+                Dialog dialog = details.getDialog();
+                add(dialog);
                 dialog.open();
         });
 
