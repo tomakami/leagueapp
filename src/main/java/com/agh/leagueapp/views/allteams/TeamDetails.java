@@ -155,7 +155,6 @@ public class TeamDetails extends FormLayout {
         region.clear();
         teamTag.clear();
         mailAddress.clear();
-        tournament.clear();
     }
 
     private void DeleteAction() {

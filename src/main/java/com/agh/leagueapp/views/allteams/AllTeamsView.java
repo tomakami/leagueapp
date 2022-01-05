@@ -3,6 +3,7 @@ package com.agh.leagueapp.views.allteams;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
+import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.views.MainLayout;
 import com.agh.leagueapp.views.tournamentlist.TournamentDetails;
 import com.vaadin.flow.component.button.Button;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 @PageTitle("Team List")
-@Route(value = "team-list", layout = MainLayout.class)
+@Route(value = LeagueAppConst.PAGE_TEAMS, layout = MainLayout.class)
 public class AllTeamsView extends VerticalLayout {
 
     private final DbService dbService;
@@ -94,27 +95,35 @@ public class AllTeamsView extends VerticalLayout {
 
         grid.addColumn(
                 new ComponentRenderer<>(Div::new, (div, team) -> {
-                    Button select = new Button();
-                    select.addThemeVariants(ButtonVariant.LUMO_ICON,
-                            ButtonVariant.LUMO_TERTIARY,
-                            ButtonVariant.LUMO_SUCCESS);
-                    select.addClickListener(e -> Notification.show("Select " + team.getTeamName()));
-                    select.setIcon(new Icon(VaadinIcon.CHECK));
-                    select.setWidth("2ep");
 
                     Button edit = new Button();
                     edit.addThemeVariants(ButtonVariant.LUMO_ICON,
                             ButtonVariant.LUMO_TERTIARY);
                     edit.addClickListener(e ->{
-                        Notification.show("Edit " + team.getTeamName());
-                        Dialog dialog = new TeamDetails(dbService.getTournamentRepository(), dbService.getTeamRepository(),team).getDialog();
+                        Dialog dialog =
+                                new TeamDetails(dbService.getTournamentRepository(), dbService.getTeamRepository(),team).getDialog();
                         add(dialog);
                         dialog.open();
                     });
-                    edit.setIcon(new Icon(VaadinIcon.EDIT));
+                    edit.setIcon(new Icon(VaadinIcon.WRENCH));
                     edit.setWidth("2ep");
 
-                    div.add(select,edit);
+
+                    Button members = new Button();
+                    members.addThemeVariants(ButtonVariant.LUMO_ICON,
+                            ButtonVariant.LUMO_TERTIARY);
+                    members.addClickListener(e ->{
+                        Dialog dialog =
+                                new Dialog(new TeamOverview(team, dbService.getTournamentRepository(), dbService.getPlayerRepository()));
+                                //new TeamOverviewBuilder(team, dbService.getTournamentRepository(), dbService.getPlayerRepository()).getDialog();
+                        dialog.setWidth("50%");
+                        add(dialog);
+                        dialog.open();
+                    });
+                    members.setIcon(new Icon(VaadinIcon.USERS));
+                    members.setWidth("2ep");
+
+                    div.add(edit, members);
                 })).setHeader("Manage")
                 .setWidth("8em").setFlexGrow(0);
 

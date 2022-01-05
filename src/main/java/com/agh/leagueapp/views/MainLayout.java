@@ -7,9 +7,12 @@ import com.agh.leagueapp.views.tournamentlist.TournamentListView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -40,6 +43,7 @@ public class MainLayout extends AppLayout {
 
         centeredMenu.add(menu);
 
+
         this.addToNavbar(true, centeredMenu);
 
     }
@@ -69,8 +73,8 @@ public class MainLayout extends AppLayout {
 
     private static Tab[] getAvailableTabs() {
         final List<Tab> tabs = new ArrayList<>();
-        tabs.add(createTab(VaadinIcon.EDIT, "Tournaments", TournamentListView.class));
-        tabs.add(createTab(VaadinIcon.CLOCK,"Teams", AllTeamsView.class));
+        tabs.add(createTab(VaadinIcon.TROPHY, "Tournaments", TournamentListView.class));
+        tabs.add(createTab(VaadinIcon.GROUP,"Teams", AllTeamsView.class));
         tabs.add(createTab(VaadinIcon.USER,"Players", HelloWorldView.class));
 
         return tabs.toArray(new Tab[tabs.size()]);

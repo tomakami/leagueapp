@@ -2,6 +2,7 @@ package com.agh.leagueapp.views.tournamentlist;
 
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
+import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,14 +19,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @PageTitle("Tournament List")
-@Route(value = "tournament-list", layout = MainLayout.class)
-public class TournamentListView extends VerticalLayout {
+@Route(value = LeagueAppConst.PAGE_TOURNAMENTS, layout = MainLayout.class)
+public class TournamentListView
+        extends VerticalLayout {
 
     private final DbService dbService;
     private final Grid<TournamentEntity> grid;

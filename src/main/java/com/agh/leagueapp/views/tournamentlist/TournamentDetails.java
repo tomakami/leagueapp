@@ -48,7 +48,7 @@ public class TournamentDetails extends FormLayout {
     private void setupForm(){
         regionSelect.setLabel("Region");
         regionSelect.setItemLabelGenerator(LeagueShard::prettyName);
-        regionSelect.setItems(LeagueAppConst.validRegions);
+        regionSelect.setItems(LeagueAppConst.VALID_REGIONS);
         regionSelect.setEmptySelectionAllowed(false);
         if(isEditing) regionSelect.setEnabled(false);
 
@@ -113,7 +113,6 @@ public class TournamentDetails extends FormLayout {
                 tournamentRepository.save(initializedEntity);
             }catch (Exception e) {
                 Notification.show("Error occurred during saving to database.", 30, Notification.Position.MIDDLE).open();
-                System.out.println("ERROR IN TOURNAMENT DETAILS\n\n" + e.toString() + "\n\n");
             }
             CancelAction();
         }
