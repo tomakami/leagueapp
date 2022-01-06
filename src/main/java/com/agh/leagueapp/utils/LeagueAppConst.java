@@ -13,12 +13,12 @@ public class LeagueAppConst {
     public static final String PAGE_ROOT = "";
 
     public static final String PAGE_TOURNAMENTS = "tournaments";
-
-
     public static final String PAGE_TEAMS = "teams";
+    public static final String PAGE_PLAYERS = "players";
 
-    public static final String API_KEY = "RGAPI-2610d314-005e-48c8-82ff-bf88dfeb3e8b";
+    public static final String API_KEY = "RGAPI-a2002589-42e7-4a72-a4ab-f566901765f0";
     public static final boolean USE_STUB = true;
+
     public static final List<LeagueShard> VALID_REGIONS = Arrays.asList(
             LeagueShard.BR1, LeagueShard.EUN1, LeagueShard.EUW1, LeagueShard.JP1,
             LeagueShard.LA1, LeagueShard.LA2, LeagueShard.NA1, LeagueShard.PBE1,

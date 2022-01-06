@@ -1,4 +1,4 @@
-package com.agh.leagueapp.views.tournamentlist;
+package com.agh.leagueapp.views.tournaments;
 
 import com.agh.leagueapp.backend.data.TournamentConfig;
 import com.agh.leagueapp.backend.entities.TournamentEntity;

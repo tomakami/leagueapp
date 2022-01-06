@@ -1,23 +1,20 @@
 package com.agh.leagueapp.views;
 
-import com.agh.leagueapp.views.about.AboutView;
-import com.agh.leagueapp.views.allteams.AllTeamsView;
-import com.agh.leagueapp.views.helloworld.HelloWorldView;
-import com.agh.leagueapp.views.tournamentlist.TournamentListView;
+import com.agh.leagueapp.views.players.PlayersView;
+import com.agh.leagueapp.views.teams.AllTeamsView;
+import com.agh.leagueapp.views.tournaments.TournamentListView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouteConfiguration;
+import com.vaadin.flow.router.RouteData;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
@@ -33,7 +30,6 @@ public class MainLayout extends AppLayout {
     private final Tabs menu;
 
     public MainLayout() {
-
         this.setDrawerOpened(false);
         menu = createMenuTabs();
         FlexLayout centeredMenu = new FlexLayout();
@@ -42,6 +38,7 @@ public class MainLayout extends AppLayout {
         centeredMenu.setAlignItems(FlexComponent.Alignment.CENTER);
 
         centeredMenu.add(menu);
+
 
 
         this.addToNavbar(true, centeredMenu);
@@ -71,11 +68,13 @@ public class MainLayout extends AppLayout {
         return tabs;
     }
 
-    private static Tab[] getAvailableTabs() {
+    protected static Tab[] getAvailableTabs() {
         final List<Tab> tabs = new ArrayList<>();
         tabs.add(createTab(VaadinIcon.TROPHY, "Tournaments", TournamentListView.class));
         tabs.add(createTab(VaadinIcon.GROUP,"Teams", AllTeamsView.class));
-        tabs.add(createTab(VaadinIcon.USER,"Players", HelloWorldView.class));
+        tabs.add(createTab(VaadinIcon.USER,"Players", PlayersView.class));
+
+
 
         return tabs.toArray(new Tab[tabs.size()]);
     }

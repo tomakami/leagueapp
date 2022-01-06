@@ -1,9 +1,8 @@
-package com.agh.leagueapp.views.allteams;
+package com.agh.leagueapp.views.teams;
 
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.repositories.PlayerRepository;
 import com.agh.leagueapp.backend.repositories.TournamentRepository;
-import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;

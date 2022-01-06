@@ -1,4 +1,4 @@
-package com.agh.leagueapp.views.tournamentlist;
+package com.agh.leagueapp.views.tournaments;
 
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
@@ -22,10 +22,10 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @PageTitle("Tournament List")
 @Route(value = LeagueAppConst.PAGE_TOURNAMENTS, layout = MainLayout.class)
+@RouteAlias(value = "", layout = MainLayout.class)
 public class TournamentListView
         extends VerticalLayout {
 
@@ -52,7 +52,7 @@ public class TournamentListView
         add(buttonPanel);
 
         grid = new Grid<>(TournamentEntity.class, false);
-        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.setWidth("60%");
 
         grid.addColumn(TournamentEntity::getTournamentId).setHeader("ID")
