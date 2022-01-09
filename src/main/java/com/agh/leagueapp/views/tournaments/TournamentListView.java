@@ -4,6 +4,8 @@ import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.views.MainLayout;
+import com.agh.leagueapp.views.tournament.TournamentView;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -56,7 +58,7 @@ public class TournamentListView
         grid.setWidth("60%");
 
         grid.addColumn(TournamentEntity::getTournamentId).setHeader("ID")
-                .setWidth("3em").setFlexGrow(0);
+                .setWidth("4em").setFlexGrow(0);
         grid.addColumn(TournamentEntity::getRegion).setHeader("Region")
                 .setWidth("5em").setFlexGrow(0);
         grid.addColumn(TournamentEntity::getTournamentName).setHeader("Tournament Name")
@@ -73,13 +75,21 @@ public class TournamentListView
 
         grid.addColumn(
                 new ComponentRenderer<>(Div::new, (div, tournament) -> {
+
                     Button select = new Button();
                     select.addThemeVariants(ButtonVariant.LUMO_ICON,
                             ButtonVariant.LUMO_TERTIARY,
                             ButtonVariant.LUMO_SUCCESS);
-                    select.addClickListener(e -> Notification.show("Select " + tournament.getTournamentName()));
+                    select.addClickListener(e -> {
+                        Notification.show("Select " + tournament.getTournamentName());
+                    });
                     select.setIcon(new Icon(VaadinIcon.CHECK));
                     select.setWidth("2ep");
+
+                    RouterLink link = new RouterLink("", (Class<? extends Component>) TournamentView.class,
+                            new RouteParameters("tournamentID", tournament.getTournamentId().toString()));
+
+                    link.add(select);
 
                     Button edit = new Button();
                     edit.addThemeVariants(ButtonVariant.LUMO_ICON,
@@ -93,7 +103,7 @@ public class TournamentListView
                     edit.setIcon(new Icon(VaadinIcon.EDIT));
                     edit.setWidth("2ep");
 
-                    div.add(select,edit);
+                    div.add(link,edit);
                 })).setHeader("Manage")
                 .setWidth("8em").setFlexGrow(0);
 

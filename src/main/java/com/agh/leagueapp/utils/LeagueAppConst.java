@@ -16,7 +16,7 @@ public class LeagueAppConst {
     public static final String PAGE_TEAMS = "teams";
     public static final String PAGE_PLAYERS = "players";
 
-    public static final String API_KEY = "RGAPI-a2002589-42e7-4a72-a4ab-f566901765f0";
+    public static final String API_KEY = "RGAPI-fb512379-6a86-41ce-9c8c-10e45ec5c051";
     public static final boolean USE_STUB = true;
 
     public static final List<LeagueShard> VALID_REGIONS = Arrays.asList(

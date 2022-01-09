@@ -2,6 +2,7 @@ package com.agh.leagueapp.views;
 
 import com.agh.leagueapp.views.players.PlayersView;
 import com.agh.leagueapp.views.teams.AllTeamsView;
+import com.agh.leagueapp.views.tournament.TournamentView;
 import com.agh.leagueapp.views.tournaments.TournamentListView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
@@ -14,7 +15,6 @@ import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouteConfiguration;
-import com.vaadin.flow.router.RouteData;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
@@ -27,15 +27,19 @@ import java.util.Optional;
 @PageTitle("LeagueTournamentApp")
 public class MainLayout extends AppLayout {
 
-    private final Tabs menu;
+    private Tabs menu;
+    private final Tabs basicMenu, detailedMenu;
 
     public MainLayout() {
         this.setDrawerOpened(false);
-        menu = createMenuTabs();
+        basicMenu = createMenuTabs();
+        detailedMenu = createMenuTabs();
         FlexLayout centeredMenu = new FlexLayout();
         centeredMenu.setSizeFull();
         centeredMenu.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         centeredMenu.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        menu = basicMenu;
 
         centeredMenu.add(menu);
 
@@ -49,8 +53,17 @@ public class MainLayout extends AppLayout {
     protected void afterNavigation() {
         super.afterNavigation();
         RouteConfiguration configuration = RouteConfiguration.forSessionScope();
+
         if (configuration.isRouteRegistered(this.getContent().getClass())) {
             String target = configuration.getUrl(this.getContent().getClass());
+
+            if(
+                    this.getContent().getClass() == TournamentView.class
+            ){
+                System.out.println("Tournament Selected View");
+                menu = detailedMenu;
+            }
+
             Optional< Component > tabToSelect = menu.getChildren().filter(tab -> {
                 Component child = tab.getChildren().findFirst().get();
                 return child instanceof RouterLink && ((RouterLink) child).getHref().equals(target);
@@ -64,17 +77,15 @@ public class MainLayout extends AppLayout {
     private static Tabs createMenuTabs() {
         final Tabs tabs = new Tabs();
         tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
-        tabs.add(getAvailableTabs());
+        tabs.add(getBasicTabs());
         return tabs;
     }
 
-    protected static Tab[] getAvailableTabs() {
+    private static Tab[] getBasicTabs() {
         final List<Tab> tabs = new ArrayList<>();
         tabs.add(createTab(VaadinIcon.TROPHY, "Tournaments", TournamentListView.class));
         tabs.add(createTab(VaadinIcon.GROUP,"Teams", AllTeamsView.class));
         tabs.add(createTab(VaadinIcon.USER,"Players", PlayersView.class));
-
-
 
         return tabs.toArray(new Tab[tabs.size()]);
     }
