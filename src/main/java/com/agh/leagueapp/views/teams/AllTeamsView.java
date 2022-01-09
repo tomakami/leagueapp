@@ -111,7 +111,6 @@ public class AllTeamsView extends VerticalLayout {
                     members.addClickListener(e ->{
                         Dialog dialog =
                                 new Dialog(new TeamOverview(team, dbService.getTournamentRepository(), dbService.getPlayerRepository()));
-                                //new TeamOverviewBuilder(team, dbService.getTournamentRepository(), dbService.getPlayerRepository()).getDialog();
                         dialog.setWidth("50%");
                         add(dialog);
                         dialog.open();

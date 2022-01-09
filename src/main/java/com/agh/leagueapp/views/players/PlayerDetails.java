@@ -162,7 +162,7 @@ public class PlayerDetails extends FormLayout {
 
     private void SaveAction(){
         if(binder.validate().isOk()){
-            LeagueShard shard = LeagueShard.fromString(region.getValue()).orElse(LeagueShard.UNKNOWN);
+            LeagueShard shard = tournamentRepository.findById(team.getValue().getTournamentId()).get().getRegion();
             PlayerEntity player;
             try{
                 player = PlayerConfig.InitializeInAPI(binder.getBean(), shard);
