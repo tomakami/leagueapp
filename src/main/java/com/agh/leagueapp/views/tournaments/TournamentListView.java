@@ -1,5 +1,6 @@
 package com.agh.leagueapp.views.tournaments;
 
+import com.agh.leagueapp.backend.Navigator;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.utils.LeagueAppConst;
@@ -33,9 +34,11 @@ public class TournamentListView
 
     private final DbService dbService;
     private final Grid<TournamentEntity> grid;
+    private final Navigator navigator;
 
-    public TournamentListView(DbService dbService) {
+    public TournamentListView(DbService dbService, Navigator navigator) {
         this.dbService = dbService;
+        this.navigator = navigator;
 
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.START);
@@ -81,6 +84,7 @@ public class TournamentListView
                             ButtonVariant.LUMO_TERTIARY,
                             ButtonVariant.LUMO_SUCCESS);
                     select.addClickListener(e -> {
+                        Navigator.setTournamentID(tournament.getTournamentId());
                         Notification.show("Select " + tournament.getTournamentName());
                     });
                     select.setIcon(new Icon(VaadinIcon.CHECK));

@@ -1,5 +1,6 @@
 package com.agh.leagueapp.views.tournament;
 
+import com.agh.leagueapp.backend.Navigator;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
@@ -8,18 +9,15 @@ import com.agh.leagueapp.views.MainLayout;
 import com.agh.leagueapp.views.teams.AllTeamsView;
 import com.agh.leagueapp.views.tournaments.TournamentListView;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HtmlContainer;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.*;
 
 import java.util.Optional;
@@ -33,16 +31,19 @@ public class TournamentView
     private String tournamentID;
 
     private final DbService dbService;
+    private final Navigator navigator;
     private TournamentEntity tournamentEntity;
 
     private final Dialog details = new Dialog();
 
-    public TournamentView(DbService dbService){
+    public TournamentView(DbService dbService, Navigator navigator){
         this.dbService = dbService;
+        this.navigator = navigator;
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
+        System.out.println("Navigator ID: " + Navigator.getTournamentID().toString());
         Optional<String> parameter = event.getRouteParameters().get("tournamentID");
         if(parameter.isEmpty() || !dbService.getTournamentRepository().existsById(Integer.valueOf(parameter.get()))) {
             event.forwardTo(TournamentListView.class);
