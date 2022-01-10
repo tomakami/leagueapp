@@ -5,9 +5,10 @@ import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.utils.LeagueAppConst;
+import com.agh.leagueapp.utils.ViewBuildUtils;
 import com.agh.leagueapp.views.MainLayout;
+import com.agh.leagueapp.views.teamdetails.TeamDetailsView;
 import com.agh.leagueapp.views.teams.AllTeamsView;
-import com.agh.leagueapp.views.tournaments.TournamentListView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -26,34 +27,46 @@ import java.util.Optional;
 @Route(value = LeagueAppConst.PAGE_TOURNAMENTS + "/:tournamentID?/overview", layout = MainLayout.class)
 public class TournamentView
         extends VerticalLayout
-        implements BeforeEnterObserver{
+        implements BeforeEnterObserver, BeforeLeaveObserver{
 
     private String tournamentID;
 
     private final DbService dbService;
-    private final Navigator navigator;
     private TournamentEntity tournamentEntity;
 
     private final Dialog details = new Dialog();
 
-    public TournamentView(DbService dbService, Navigator navigator){
+    public TournamentView(DbService dbService){
         this.dbService = dbService;
-        this.navigator = navigator;
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        System.out.println("Navigator ID: " + Navigator.getTournamentID().toString());
+        boolean forwarded = false;
         Optional<String> parameter = event.getRouteParameters().get("tournamentID");
-        if(parameter.isEmpty() || !dbService.getTournamentRepository().existsById(Integer.valueOf(parameter.get()))) {
-            event.forwardTo(TournamentListView.class);
-        }
-        else {
-            tournamentID = parameter.get();
-            tournamentEntity = dbService.getTournamentRepository().findById(Integer.valueOf(tournamentID)).orElseThrow();
 
+        if(parameter.isEmpty()) {
+            forwarded = true;
+            tournamentID = Navigator.getTournamentID().toString();
+            event.forwardTo(TournamentView.class,
+                    new RouteParameters("tournamentID", tournamentID));
+        }
+        else
+            tournamentID = parameter.get();
+
+        if(!dbService.getTournamentRepository().existsById(Integer.valueOf(tournamentID))) {
+            event.forwardTo(AllTeamsView.class);
+        }
+        else if (!forwarded){
+            tournamentEntity = dbService.getTournamentRepository().findById(Integer.valueOf(tournamentID)).orElseThrow();
+            Navigator.setTournamentID(Integer.valueOf(tournamentID));
             setupOverview();
         }
+    }
+
+    @Override
+    public void beforeLeave(BeforeLeaveEvent event){
+        this.removeAll();
     }
 
     private void setupOverview() {
@@ -107,7 +120,7 @@ public class TournamentView
         leftPart.setHeightFull();
         leftPart.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         leftPart.add(
-                setupLinkButton("See detailed team list", AllTeamsView.class),
+                setupLinkButton("See detailed team list", TeamDetailsView.class, new RouteParameters("tournamentID", tournamentID)),
                 setupTeamGrid()
         );
 
@@ -183,9 +196,9 @@ public class TournamentView
         return teamGrid;
     }
 
-    private RouterLink setupLinkButton(String t, Class<? extends Component> c){
+    private RouterLink setupLinkButton(String t, Class<? extends Component> c, RouteParameters params){
         Button teamListButton = new Button(t);
-        RouterLink teamListLink = new RouterLink("", c);
+        RouterLink teamListLink = new RouterLink("", c, params);
         teamListLink.add(teamListButton);
 
         return teamListLink;
@@ -198,18 +211,18 @@ public class TournamentView
 
         layout.add(new H3(tournamentEntity.getTournamentName()));
 
-        layout.add(headerWithContent("Region", tournamentEntity.getRegion().prettyName()));
-        layout.add(headerWithContent("Description", tournamentEntity.getComment()));
+        layout.add(ViewBuildUtils.headerWithContent("Region", tournamentEntity.getRegion().prettyName()));
+        layout.add(ViewBuildUtils.headerWithContent("Description", tournamentEntity.getComment()));
 
         layout.add(new HorizontalLayout(
-                headerWithContent("ID", tournamentID), new Span(),
-                headerWithContent("API ID", tournamentEntity.getApiId()), new Span(),
-                headerWithContent("Team Size", tournamentEntity.getTeamSize().toString())
+                ViewBuildUtils.headerWithContent("ID", tournamentID), new Span(),
+                ViewBuildUtils.headerWithContent("API ID", tournamentEntity.getApiId()), new Span(),
+                ViewBuildUtils.headerWithContent("Team Size", tournamentEntity.getTeamSize().toString())
         ));
 
         layout.add(new HorizontalLayout(
-                headerWithContent("Provider ID", tournamentEntity.getProviderId().toString()), new Span(),
-                headerWithContent("Provider URL", tournamentEntity.getProviderUrl())
+                ViewBuildUtils.headerWithContent("Provider ID", tournamentEntity.getProviderId().toString()), new Span(),
+                ViewBuildUtils.headerWithContent("Provider URL", tournamentEntity.getProviderUrl())
         ));
 
         Button close = new Button("Close");
@@ -219,17 +232,5 @@ public class TournamentView
         details.add(layout);
     }
 
-    private Div headerWithContent(String header, String content){
-        H4 title = new H4(header);
-        title.getStyle().set("margin", "0px");
-        title.getStyle().set("text-align","center");
 
-        Paragraph cont = new Paragraph(content);
-        cont.getStyle().set("margin", "0px");
-        cont.getStyle().set("text-align","center");
-
-        Div div = new Div();
-        div.add(title, cont);
-        return div;
-    }
 }

@@ -60,7 +60,7 @@ public class TeamDetails extends FormLayout {
         tournament.addValueChangeListener(click -> region.setValue(tournament.getValue().getRegion().prettyName()));
 
         region.setReadOnly(true);
-        if (isEditing) tournament.setEnabled(false);
+        tournament.setReadOnly(isEditing);
 
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickListener(buttonClickEvent -> SaveAction());
@@ -133,7 +133,7 @@ public class TeamDetails extends FormLayout {
             try{
                 teamRepository.save(binder.getBean());
             }catch (Exception e) {
-                Notification.show("Error occured during saving to database.", 3, Notification.Position.MIDDLE).open();
+                Notification.show("Error occurred during saving to database.", 4000, Notification.Position.MIDDLE).open();
             }
             CancelAction();
         }

@@ -2,6 +2,7 @@ package com.agh.leagueapp.views;
 
 import com.agh.leagueapp.backend.Navigator;
 import com.agh.leagueapp.views.players.PlayersView;
+import com.agh.leagueapp.views.teamdetails.TeamDetailsView;
 import com.agh.leagueapp.views.teams.AllTeamsView;
 import com.agh.leagueapp.views.tournament.TournamentView;
 import com.agh.leagueapp.views.tournaments.TournamentListView;
@@ -76,7 +77,8 @@ public class MainLayout extends AppLayout {
         if (configuration.isRouteRegistered(this.getContent().getClass())) {
             String target = configuration.getUrl(this.getContent().getClass());
 
-            if(this.getContent().getClass() ==TournamentView.class){
+            if(this.getContent().getClass() == TournamentView.class
+                    || this.getContent().getClass() == TeamDetailsView.class){
                 menu = detailedMenu;
                 basicMenu.setSelectedTab(null);
             }
@@ -109,7 +111,7 @@ public class MainLayout extends AppLayout {
         final Tabs tabs = new Tabs();
         tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
         tabs.add(createTab(VaadinIcon.SEARCH, "Overview", TournamentView.class));
-        tabs.add(createTab(VaadinIcon.GROUP,"Teams", AllTeamsView.class));
+        tabs.add(createTab(VaadinIcon.GROUP,"Teams", TeamDetailsView.class));
         tabs.add(createTab(VaadinIcon.USERS,"Players", PlayersView.class));
 
         return tabs;

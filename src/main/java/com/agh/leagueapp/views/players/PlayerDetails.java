@@ -96,6 +96,7 @@ public class PlayerDetails extends FormLayout {
 
         this.add(firstName, lastName, indexNumber, team, region, tournament, summonerName, role, new Span(), save, cancel);
         if (isEditing) this.add(delete);
+        team.setReadOnly(isEditing);
         this.setResponsiveSteps(new ResponsiveStep("0", 3));
     }
 
