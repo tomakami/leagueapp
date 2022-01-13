@@ -16,7 +16,7 @@ public class LeagueAppConst {
     public static final String PAGE_TEAMS = "teams";
     public static final String PAGE_PLAYERS = "players";
 
-    public static final String API_KEY = "RGAPI-fb512379-6a86-41ce-9c8c-10e45ec5c051";
+    public static final String API_KEY = "RGAPI-946a1856-017e-4d33-835e-09198fd4e4bb";
     public static final boolean USE_STUB = true;
 
     public static final List<LeagueShard> VALID_REGIONS = Arrays.asList(
@@ -24,11 +24,11 @@ public class LeagueAppConst {
             LeagueShard.LA1, LeagueShard.LA2, LeagueShard.NA1, LeagueShard.PBE1,
             LeagueShard.RU, LeagueShard.TR1);
 
-    public static final Image TOP = new Image("positionIcons/icon-position-top.png", "Top");
-    public static final Image JUNGLE = new Image("positionIcons/icon-position-jungle.png", "Jungle");
-    public static final Image MIDDLE = new Image("positionIcons/icon-position-middle.png", "Middle");
-    public static final Image BOTTOM = new Image("positionIcons/icon-position-bottom.png", "Bottom");
-    public static final Image UTILITY = new Image("positionIcons/icon-position-utility.png", "Support");
-    public static final Image FILL = new Image("positionIcons/icon-position-fill.png", "Fill");
-    public static final Image UNSELECTED = new Image("positionIcons/icon-position-unselected.png", "Unselected");
+    public static final String TOP = "positionIcons/icon-position-top.png";
+    public static final String JUNGLE = "positionIcons/icon-position-jungle.png";
+    public static final String MIDDLE = "positionIcons/icon-position-middle.png";
+    public static final String BOTTOM = "positionIcons/icon-position-bottom.png";
+    public static final String UTILITY = "positionIcons/icon-position-utility.png";
+    public static final String FILL = "positionIcons/icon-position-fill.png";
+    public static final String UNSELECTED = "positionIcons/icon-position-unselected.png";
 }

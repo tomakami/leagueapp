@@ -4,6 +4,7 @@ import com.agh.leagueapp.backend.Navigator;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
+import com.agh.leagueapp.utils.GridBuilders.TeamGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.utils.ViewBuildUtils;
 import com.agh.leagueapp.views.MainLayout;
@@ -145,55 +146,19 @@ public class TournamentView
     }
 
     private Grid<TeamEntity> setupTeamGrid(){
-        Grid<TeamEntity> teamGrid = new Grid<>(TeamEntity.class, false);
-        teamGrid.setSelectionMode(Grid.SelectionMode.NONE);
+        TeamGridBuilder teamGridBuilder = new TeamGridBuilder(dbService);
 
-        teamGrid.addColumn(TeamEntity::getTeamTag).setHeader("Tag")
-                .setAutoWidth(true).setFlexGrow(1);
+        teamGridBuilder
+                .withSelectionMode(Grid.SelectionMode.NONE)
+                .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
+                .withTagColumn()
+                .withTeamNameColumn(true, 1)
+                .withPlayerCountColumn()
+                .withGameCountColumn()
+                .withDataProvider(new ListDataProvider<>(
+                        dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())));
 
-        teamGrid.addColumn(TeamEntity::getTeamName).setHeader("Team Name")
-                .setAutoWidth(true).setFlexGrow(3);
-
-        teamGrid.addColumn(
-                        new ComponentRenderer<>(Paragraph::new, (p, team) -> {
-                            String temp;
-                            p.getStyle().set("text-align", "center");
-                            try{
-                                temp = String.valueOf(dbService.getPlayerRepository().countPlayerEntitiesByTeamId(team.getTeamId()));
-                            }catch(Exception e){
-                                temp = "";
-                            }
-                            p.setText(temp);
-
-                        }
-                        )).setHeader("Players")
-                .setWidth("5em").setFlexGrow(0);
-
-        teamGrid.addColumn(
-                        new ComponentRenderer<>(Paragraph::new, (p, team) -> {
-                            String temp;
-                            p.getStyle().set("text-align", "center");
-                            try{
-                                temp = String.valueOf(
-                                        dbService.getGameRepository().
-                                                countGameEntitiesByBlueTeamId(team.getTeamId()) +
-                                                dbService.getGameRepository().
-                                                        countGameEntitiesByRedTeamId(team.getTeamId()));
-                            }catch(Exception e){
-                                temp = "";
-                            }
-                            p.setText(temp);
-
-                        }
-                        )).setHeader("Games Played")
-                .setWidth("5em").setFlexGrow(0);
-
-        teamGrid.setDataProvider(new ListDataProvider<>(
-                dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())));
-
-        teamGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT);
-
-        return teamGrid;
+        return teamGridBuilder.getTeamGrid();
     }
 
     private RouterLink setupLinkButton(String t, Class<? extends Component> c, RouteParameters params){

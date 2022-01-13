@@ -1,8 +1,8 @@
 package com.agh.leagueapp.utils;
 
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Paragraph;
+import com.agh.leagueapp.backend.entities.PlayerEntity;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 public class ViewBuildUtils {
     public static Div headerWithContent(String header, String content){
@@ -17,5 +17,38 @@ public class ViewBuildUtils {
         Div div = new Div();
         div.add(title, cont);
         return div;
+    }
+
+    public static ComponentRenderer<Span, PlayerEntity> roleIconRenderer(String size){
+                return new ComponentRenderer<>(Span::new, (span, player) -> {
+                    String position = player.getPosition();
+                    Image roleIcon;
+                    if(position == null) position="";
+                    switch (position){
+                        case "Top":
+                            roleIcon = new Image(LeagueAppConst.TOP, "Top");
+                            break;
+                        case "Jungle":
+                            roleIcon = new Image(LeagueAppConst.JUNGLE, "Jungle");
+                            break;
+                        case "Middle":
+                            roleIcon = new Image(LeagueAppConst.MIDDLE, "Middle");
+                            break;
+                        case "Bottom":
+                            roleIcon = new Image(LeagueAppConst.BOTTOM, "Bottom");
+                            break;
+                        case "Support":
+                            roleIcon = new Image(LeagueAppConst.UTILITY, "Support");
+                            break;
+                        case "Fill":
+                            roleIcon = new Image(LeagueAppConst.FILL, "Fill");
+                            break;
+                        default:
+                            roleIcon = new Image(LeagueAppConst.UNSELECTED, "Unselected");
+                    }
+                    roleIcon.setWidth(size);
+                    roleIcon.setHeight(size);
+                    span.add(roleIcon);
+                });
     }
 }
