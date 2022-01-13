@@ -16,7 +16,6 @@ public class TournamentEntity {
     private String provider_url;
     private Integer provider_id;
     private Integer team_size;
-    private Collection<GroupEntity> groupsByTournamentId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -124,14 +123,5 @@ public class TournamentEntity {
         result = 31 * result + (tournamentName != null ? tournamentName.hashCode() : 0);
         result = 31 * result + (comment != null ? comment.hashCode() : 0);
         return result;
-    }
-
-    @OneToMany(mappedBy = "tournamentByTournamentId")
-    public Collection<GroupEntity> getGroupsByTournamentId() {
-        return groupsByTournamentId;
-    }
-
-    public void setGroupsByTournamentId(Collection<GroupEntity> groupsByTournamentId) {
-        this.groupsByTournamentId = groupsByTournamentId;
     }
 }

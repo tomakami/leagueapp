@@ -13,8 +13,6 @@ public class TeamEntity {
     private String mailAddress;
     private Collection<GameEntity> gamesByTeamId;
     private Collection<GameEntity> gamesByTeamId_0;
-    private Collection<MatchEntity> matchesByTeamId;
-    private Collection<MatchEntity> matchesByTeamId_0;
     private Collection<PlayerEntity> playersByTeamId;
 
     @Id
@@ -110,24 +108,6 @@ public class TeamEntity {
 
     public void setGamesByTeamId_0(Collection<GameEntity> gamesByTeamId_0) {
         this.gamesByTeamId_0 = gamesByTeamId_0;
-    }
-
-    @OneToMany(mappedBy = "teamByTeam1Id")
-    public Collection<MatchEntity> getMatchesByTeamId() {
-        return matchesByTeamId;
-    }
-
-    public void setMatchesByTeamId(Collection<MatchEntity> matchesByTeamId) {
-        this.matchesByTeamId = matchesByTeamId;
-    }
-
-    @OneToMany(mappedBy = "teamByTeam2Id")
-    public Collection<MatchEntity> getMatchesByTeamId_0() {
-        return matchesByTeamId_0;
-    }
-
-    public void setMatchesByTeamId_0(Collection<MatchEntity> matchesByTeamId_0) {
-        this.matchesByTeamId_0 = matchesByTeamId_0;
     }
 
     @OneToMany(mappedBy = "teamByTeamId")

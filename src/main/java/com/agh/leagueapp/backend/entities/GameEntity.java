@@ -7,11 +7,9 @@ import javax.persistence.*;
 public class GameEntity {
 
     private Integer gameId;
-    private Integer matchId;
     private Integer blueTeamId;
     private Integer redTeamId;
     private String tournamentCode;
-    private MatchEntity matchByMatchId;
     private TeamEntity teamByBlueTeamId;
     private TeamEntity teamByRedTeamId;
 
@@ -32,16 +30,6 @@ public class GameEntity {
 
     public void setGameId(Integer gameId) {
         this.gameId = gameId;
-    }
-
-    @Basic
-    @Column(name = "match_id", nullable = true)
-    public Integer getMatchId() {
-        return matchId;
-    }
-
-    public void setMatchId(Integer matchId) {
-        this.matchId = matchId;
     }
 
     @Basic
@@ -82,7 +70,6 @@ public class GameEntity {
         GameEntity that = (GameEntity) o;
 
         if (gameId != null ? !gameId.equals(that.gameId) : that.gameId != null) return false;
-        if (matchId != null ? !matchId.equals(that.matchId) : that.matchId != null) return false;
         if (blueTeamId != null ? !blueTeamId.equals(that.blueTeamId) : that.blueTeamId != null) return false;
         if (redTeamId != null ? !redTeamId.equals(that.redTeamId) : that.redTeamId != null) return false;
         if (tournamentCode != null ? !tournamentCode.equals(that.tournamentCode) : that.tournamentCode != null)
@@ -94,7 +81,6 @@ public class GameEntity {
     @Override
     public int hashCode() {
         int result = gameId != null ? gameId.hashCode() : 0;
-        result = 31 * result + (matchId != null ? matchId.hashCode() : 0);
         result = 31 * result + (blueTeamId != null ? blueTeamId.hashCode() : 0);
         result = 31 * result + (redTeamId != null ? redTeamId.hashCode() : 0);
         result = 31 * result + (tournamentCode != null ? tournamentCode.hashCode() : 0);
@@ -107,16 +93,6 @@ public class GameEntity {
                 "gameId=" + gameId +
                 ", tournamentCode='" + tournamentCode + '\'' +
                 '}';
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "match_id", referencedColumnName = "match_id", insertable = false, updatable = false)
-    public MatchEntity getMatchByMatchId() {
-        return matchByMatchId;
-    }
-
-    public void setMatchByMatchId(MatchEntity matchByMatchId) {
-        this.matchByMatchId = matchByMatchId;
     }
 
     @ManyToOne

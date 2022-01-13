@@ -6,6 +6,7 @@ import com.agh.leagueapp.backend.entities.PlayerEntity;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
+import com.agh.leagueapp.utils.GridBuilders.TeamGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.utils.GridBuilders.PlayerGridBuilder;
 import com.agh.leagueapp.utils.ViewBuildUtils;
@@ -43,7 +44,6 @@ public class TeamDetailsView
 
     private String tournamentID;
     private final VerticalLayout listLayout, detailsLayout;
-    private final Grid<TeamEntity> teamGrid = new Grid<>(TeamEntity.class, false);
     private final Grid<GameEntity> gameGrid = new Grid<>(GameEntity.class, false);
 
 
@@ -96,18 +96,53 @@ public class TeamDetailsView
     private void setupListLayout(){
         listLayout.setWidth("40%");
         listLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        listLayout.getStyle().set("border", "4px dotted blue");
+        listLayout.getStyle().set("border", "4px solid blue");
         listLayout.removeAll();
 
-        setupTeamButtonPanel();
-        setupTeamGrid();
+        final TeamGridBuilder teamGridBuilder = new TeamGridBuilder(dbService);
+
+        teamGridBuilder
+                .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
+                .withSelectionMode(Grid.SelectionMode.SINGLE)
+                .withTagColumn()
+                .withTeamNameColumn(true, 1)
+                .withMailAddress(true, 1)
+                .withPlayerCountColumn()
+                .withDataProvider(new ListDataProvider<>(
+                        dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())));
+
+        final HorizontalLayout buttonPanel = teamGridBuilder.getButtonPanel(this);
+        final Grid<TeamEntity> teamGrid = teamGridBuilder.getTeamGrid();
+
+        teamGrid.addColumn(
+                new ComponentRenderer<>(Span::new, (span, team) -> {
+                    Button details = new Button();
+                    details.setIcon(VaadinIcon.PLAY.create());
+                    details.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SUCCESS);
+                    details.addClickListener(click -> {
+                        this.teamEntity = team;
+                        setupDetailsLayout();
+                    });
+
+                    span.add(details);
+                    span.getStyle().set("text-align","center");
+                }
+                )).setHeader("Details")
+                .setWidth("5em").setFlexGrow(0);
+
+        buttonPanel.setWidth("80%");
+        buttonPanel.getStyle().set("border","4px solid pink");
+        teamGrid.setWidth("80%");
+        teamGrid.getStyle().set("border","4px solid pink");
+
+        listLayout.setHorizontalComponentAlignment(Alignment.CENTER, teamGrid);
+        listLayout.add(buttonPanel, teamGrid);
     }
     private void setupDetailsLayout(){
         detailsLayout.removeAll();
         gameGrid.removeAllColumns();
-
         detailsLayout.setWidth("60%");
-        detailsLayout.getStyle().set("border", "4px solid green");
+        detailsLayout.getStyle().set("border", "4px dotted green");
 
         if(this.teamEntity == null){
             detailsLayout.add(new Paragraph("haha lol empty"));
@@ -145,56 +180,6 @@ public class TeamDetailsView
         detailsLayout.add(infoPanel, listPanel);
     }
 
-    private void setupTeamGrid(){
-        teamGrid.setWidth("80%");
-        teamGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-
-        teamGrid.addColumn(TeamEntity::getTeamTag).setHeader(" Tag")
-                .setWidth("5em").setFlexGrow(0);
-        teamGrid.addColumn(TeamEntity::getTeamName).setHeader("Team Name")
-                .setAutoWidth(true);
-        teamGrid.addColumn(TeamEntity::getMailAddress).setHeader("Email")
-                .setAutoWidth(true);
-
-        teamGrid.addColumn(
-                        new ComponentRenderer<>(Paragraph::new, (p, team) -> {
-                            String temp;
-                            try{
-                                temp = String.valueOf(dbService.getPlayerRepository().countPlayerEntitiesByTeamId(team.getTeamId()));
-                            }catch(Exception e){
-                                temp = "";
-                            }
-                            p.getStyle().set("text-align","center");
-                            p.setText(temp);
-
-                        }
-                        )).setHeader("Players")
-                .setWidth("5em").setFlexGrow(0);
-
-        teamGrid.addColumn(
-                        new ComponentRenderer<>(Paragraph::new, (p, team) -> {
-                            Button details = new Button();
-                            details.setIcon(VaadinIcon.PLAY.create());
-                            details.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SUCCESS);
-                            details.addClickListener(click -> {
-                                this.teamEntity = team;
-                                setupDetailsLayout();
-                            });
-
-                            p.add(details);
-                            p.getStyle().set("text-align","center");
-                        }
-                        )).setHeader("Details")
-                .setWidth("5em").setFlexGrow(0);
-
-        teamGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT);
-        teamGrid.setDataProvider(new ListDataProvider<>(
-                dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())));
-
-        listLayout.add(teamGrid);
-        listLayout.setHorizontalComponentAlignment(Alignment.CENTER, teamGrid);
-    }
-
     private VerticalLayout setupPlayerList(){
         final PlayerGridBuilder gridBuilder = new PlayerGridBuilder(dbService);
         gridBuilder
@@ -216,7 +201,6 @@ public class TeamDetailsView
         return new VerticalLayout(buttonPanel, playerGrid);
     }
 
-
     private void setupGameGrid(){
         gameGrid.setWidthFull();
         gameGrid.setSelectionMode(Grid.SelectionMode.NONE);
@@ -233,90 +217,6 @@ public class TeamDetailsView
                         dbService.getGameRepository().
                                 findAllByBlueTeamIdOrRedTeamId
                                         (teamEntity.getTeamId(), teamEntity.getTeamId())));
-    }
-
-    private void setupTeamButtonPanel(){
-        HorizontalLayout buttonPanel = new HorizontalLayout();
-        buttonPanel.getStyle().set("border", "4px dotted red");
-        buttonPanel.setJustifyContentMode(JustifyContentMode.END);
-        buttonPanel.setDefaultVerticalComponentAlignment(Alignment.CENTER);
-        buttonPanel.setWidth("80%");
-
-        Button refresh = new Button();
-        {
-            refresh.addThemeVariants(ButtonVariant.LUMO_LARGE);
-            refresh.setIcon(VaadinIcon.REFRESH.create());
-
-            refresh.addClickListener(buttonClickEvent ->
-                    teamGrid.setDataProvider(new ListDataProvider<>(
-                            dbService.getTeamRepository()
-                                    .findAllByTournamentId(tournamentEntity.getTournamentId()))));
-        }
-
-        Button newTeam = new Button();
-        {
-            newTeam.addThemeVariants(ButtonVariant.LUMO_LARGE);
-            newTeam.setIcon(VaadinIcon.PLUS.create());
-            newTeam.addClickListener(click -> {
-                TeamEntity team = new TeamEntity();
-                team.setTournamentId(Integer.valueOf(tournamentID));
-                TeamDetails details = new TeamDetails(dbService.getTournamentRepository(), dbService.getTeamRepository(), team);
-                Dialog dialog = details.getDialog();
-                dialog.addOpenedChangeListener(change -> {
-                    if (!change.isOpened()) refresh.click();
-                });
-                dialog.setWidth("40%");
-                add(dialog);
-                dialog.open();
-            });
-        }
-
-        Button edit = new Button();
-        {
-            edit.addThemeVariants(ButtonVariant.LUMO_LARGE);
-            edit.setIcon(VaadinIcon.WRENCH.create());
-            edit.setEnabled(false);
-
-            teamGrid.addSelectionListener((SelectionListener<Grid<TeamEntity>, TeamEntity>)
-                    selectionEvent -> edit.setEnabled(selectionEvent.getFirstSelectedItem().isPresent()));
-
-            edit.addClickListener(buttonClickEvent -> {
-                        TeamDetails details = new TeamDetails(dbService.getTournamentRepository(), dbService.getTeamRepository(),
-                                teamGrid.getSelectedItems().stream().findFirst().orElse(new TeamEntity()));
-                        Dialog dialog = details.getDialog();
-                        dialog.addOpenedChangeListener(change -> {
-                            if (!change.isOpened()) refresh.click();
-                        });
-                        dialog.setWidth("40%");
-                        add(dialog);
-                        dialog.open();
-                    }
-            );
-        }
-
-        Button delete = new Button();
-        {
-            delete.addThemeVariants(ButtonVariant.LUMO_LARGE);
-            delete.setIcon(VaadinIcon.TRASH.create());
-            delete.setEnabled(false);
-
-            teamGrid.addSelectionListener((SelectionListener<Grid<TeamEntity>, TeamEntity>)
-                    selectionEvent -> delete.setEnabled(selectionEvent.getFirstSelectedItem().isPresent()));
-
-            delete.addClickListener(buttonClickEvent -> {
-                try {
-                    dbService.getTeamRepository().delete(
-                            teamGrid.getSelectedItems().stream().findFirst().orElseThrow());
-                    refresh.click();
-                }catch (Exception e){
-                    Notification.show("Failed to delete team from database.", 4000, Notification.Position.MIDDLE);
-                }
-            }
-            );
-        }
-
-        buttonPanel.add(newTeam, edit, delete, refresh);
-        listLayout.add(buttonPanel);
     }
 
     private VerticalLayout setupGameList(){

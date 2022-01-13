@@ -1,6 +1,7 @@
 package com.agh.leagueapp.views;
 
 import com.agh.leagueapp.backend.Navigator;
+import com.agh.leagueapp.views.games.GameDetailsView;
 import com.agh.leagueapp.views.playerdetails.PlayerDetailsView;
 import com.agh.leagueapp.views.players.PlayersView;
 import com.agh.leagueapp.views.teamdetails.TeamDetailsView;
@@ -114,6 +115,7 @@ public class MainLayout extends AppLayout {
         tabs.add(createTab(VaadinIcon.SEARCH, "Overview", TournamentView.class));
         tabs.add(createTab(VaadinIcon.GROUP,"Teams", TeamDetailsView.class));
         tabs.add(createTab(VaadinIcon.USERS,"Players", PlayerDetailsView.class));
+        tabs.add(createTab(VaadinIcon.GAMEPAD,"Games", GameDetailsView.class));
 
         return tabs;
     }

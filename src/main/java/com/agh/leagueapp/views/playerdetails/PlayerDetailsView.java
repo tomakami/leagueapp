@@ -11,10 +11,13 @@ import com.agh.leagueapp.utils.GridBuilders.PlayerGridBuilder;
 import com.agh.leagueapp.utils.ViewBuildUtils;
 import com.agh.leagueapp.views.MainLayout;
 import com.agh.leagueapp.views.players.PlayersView;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -109,6 +112,22 @@ public class PlayerDetailsView
         final HorizontalLayout buttonPanel = gridBuilder.getButtonPanel(this);
         final Grid<PlayerEntity> playerGrid = gridBuilder.getPlayerGrid();
 
+        playerGrid.addColumn(
+                        new ComponentRenderer<>(Span::new, (span, team) -> {
+                            Button details = new Button();
+                            details.setIcon(VaadinIcon.PLAY.create());
+                            details.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SUCCESS);
+                            details.addClickListener(click -> {
+                                this.playerEntity = team;
+                                setupDetailsLayout();
+                            });
+
+                            span.add(details);
+                            span.getStyle().set("text-align","center");
+                        }
+                        )).setHeader("Details")
+                .setWidth("5em").setFlexGrow(0);
+
         buttonPanel.setWidth("90%");
         buttonPanel.getStyle().set("border", "4px dotted red");
         playerGrid.setWidth("90%");
@@ -132,9 +151,9 @@ public class PlayerDetailsView
         infoPanel.setJustifyContentMode(JustifyContentMode.EVENLY);
         infoPanel.setWidth("80%");
         infoPanel.add(
-                ViewBuildUtils.headerWithContent("Name", playerEntity.getFirstName() + playerEntity.getLastName()),
+                ViewBuildUtils.headerWithContent("Name", playerEntity.getFirstName() + " " + playerEntity.getLastName()),
                 ViewBuildUtils.headerWithContent("Team Name", dbService.getTeamRepository().findById(playerEntity.getTeamId()).get().getTeamName()),
-                ViewBuildUtils.headerWithContent("Summoner ", playerEntity.getSummonerName()),
+                ViewBuildUtils.headerWithContent("Summoner Name", playerEntity.getSummonerName()),
                 ViewBuildUtils.headerWithContent("Position", playerEntity.getPosition()));
 
         HorizontalLayout listPanel = new HorizontalLayout();

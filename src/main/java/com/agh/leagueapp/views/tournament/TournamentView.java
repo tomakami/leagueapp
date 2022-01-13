@@ -1,13 +1,16 @@
 package com.agh.leagueapp.views.tournament;
 
 import com.agh.leagueapp.backend.Navigator;
+import com.agh.leagueapp.backend.entities.PlayerEntity;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
+import com.agh.leagueapp.utils.GridBuilders.PlayerGridBuilder;
 import com.agh.leagueapp.utils.GridBuilders.TeamGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.utils.ViewBuildUtils;
 import com.agh.leagueapp.views.MainLayout;
+import com.agh.leagueapp.views.playerdetails.PlayerDetailsView;
 import com.agh.leagueapp.views.teamdetails.TeamDetailsView;
 import com.agh.leagueapp.views.teams.AllTeamsView;
 import com.vaadin.flow.component.Component;
@@ -22,6 +25,8 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @PageTitle("Tournament List")
@@ -95,7 +100,6 @@ public class TournamentView
         region.getStyle().set("margin", "0px");
 
         VerticalLayout headerContent = new VerticalLayout();
-        headerContent.getStyle().set("border", "4px dotted orange");
         headerContent.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         headerContent.setWidth("70%");
         headerContent.setPadding(false);
@@ -106,7 +110,6 @@ public class TournamentView
                 region);
 
         HorizontalLayout header = new HorizontalLayout();
-        header.getStyle().set("border", "4px dotted blue");
         header.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         header.add(filler, headerContent, detailsButton);
@@ -129,6 +132,11 @@ public class TournamentView
         middlePart.getStyle().set("border", "4px dotted brown");
         middlePart.setWidthFull();
         middlePart.setHeightFull();
+        middlePart.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        middlePart.add(
+                setupLinkButton("See detailed player list", PlayerDetailsView.class, new RouteParameters("tournamentID", tournamentID)),
+                setupPlayerGrid()
+        );
 
         VerticalLayout rightPart = new VerticalLayout();
         rightPart.getStyle().set("border", "4px dotted blue");
@@ -159,6 +167,27 @@ public class TournamentView
                         dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())));
 
         return teamGridBuilder.getTeamGrid();
+    }
+
+    private Grid<PlayerEntity> setupPlayerGrid(){
+        PlayerGridBuilder playerGridBuilder = new PlayerGridBuilder(dbService);
+
+        List<Integer> teams = new ArrayList<>();
+        dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())
+                .forEach(teamEntity -> teams.add(teamEntity.getTeamId()));
+
+        playerGridBuilder
+                .withSelectionMode(Grid.SelectionMode.NONE)
+                .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
+                .withRoleColumn("2em", "4em")
+                .withTeamTagColumn()
+                .withSummonerNameColumn(true, 1)
+                .withPlayerNameColumn(true, 1)
+                .withDataProvider(new ListDataProvider<>(
+                        dbService.getPlayerRepository().findPlayerEntitiesByTeamIdIsIn(teams)
+                ));
+
+        return playerGridBuilder.getPlayerGrid();
     }
 
     private RouterLink setupLinkButton(String t, Class<? extends Component> c, RouteParameters params){
