@@ -1,4 +1,4 @@
-package com.agh.leagueapp.views.tournament;
+package com.agh.leagueapp.views.detailedviews;
 
 import com.agh.leagueapp.backend.Navigator;
 import com.agh.leagueapp.backend.entities.PlayerEntity;
@@ -10,19 +10,19 @@ import com.agh.leagueapp.utils.GridBuilders.TeamGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.utils.ViewBuildUtils;
 import com.agh.leagueapp.views.MainLayout;
-import com.agh.leagueapp.views.playerdetails.PlayerDetailsView;
-import com.agh.leagueapp.views.teamdetails.TeamDetailsView;
-import com.agh.leagueapp.views.teams.AllTeamsView;
+import com.agh.leagueapp.views.generalviews.AllTeamsView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.Optional;
 
 @PageTitle("Tournament List")
 @Route(value = LeagueAppConst.PAGE_TOURNAMENTS + "/:tournamentID?/overview", layout = MainLayout.class)
-public class TournamentView
+public class TournamentOverview
         extends VerticalLayout
         implements BeforeEnterObserver, BeforeLeaveObserver{
 
@@ -42,7 +42,7 @@ public class TournamentView
 
     private final Dialog details = new Dialog();
 
-    public TournamentView(DbService dbService){
+    public TournamentOverview(DbService dbService){
         this.dbService = dbService;
     }
 
@@ -54,7 +54,7 @@ public class TournamentView
         if(parameter.isEmpty()) {
             forwarded = true;
             tournamentID = Navigator.getTournamentID().toString();
-            event.forwardTo(TournamentView.class,
+            event.forwardTo(TournamentOverview.class,
                     new RouteParameters("tournamentID", tournamentID));
         }
         else
@@ -164,7 +164,8 @@ public class TournamentView
                 .withPlayerCountColumn()
                 .withGameCountColumn()
                 .withDataProvider(new ListDataProvider<>(
-                        dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())));
+                        dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())))
+                .withDataByTournamentId(List.of(tournamentEntity.getTournamentId()));
 
         return teamGridBuilder.getTeamGrid();
     }

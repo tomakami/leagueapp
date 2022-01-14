@@ -3,7 +3,7 @@ package com.agh.leagueapp.utils.GridBuilders;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
-import com.agh.leagueapp.views.teams.TeamDetails;
+import com.agh.leagueapp.views.forms.TeamForm;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -15,18 +15,21 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.selection.SelectionListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
 public class TeamGridBuilder {
 
     private Grid<TeamEntity> teamGrid;
+    private List<Integer> tournamentIds;
+    private Button refresh;
     private final DbService dbService;
-
-    private DataProvider<TeamEntity, ?> dataProvider;
 
     public TeamGridBuilder(DbService dbService){
         this.dbService = dbService;
@@ -38,18 +41,15 @@ public class TeamGridBuilder {
 
     public void reset(){
         this.teamGrid = new Grid<>(TeamEntity.class, false);
+        this.refresh = null;
     }
 
     public void resetData(){
-        teamGrid.setDataProvider(dataProvider);
+        getRefreshButton().click();
     }
 
     public Grid<TeamEntity> getTeamGrid(){
         return teamGrid;
-    }
-
-    private void refresh(){
-
     }
 
 
@@ -66,8 +66,12 @@ public class TeamGridBuilder {
     }
 
     public TeamGridBuilder withDataProvider(DataProvider<TeamEntity, ?> dataProvider){
-        this.dataProvider = dataProvider;
-        resetData();
+        teamGrid.setDataProvider(dataProvider);
+        return this;
+    }
+
+    public TeamGridBuilder withDataByTournamentId(List<Integer> tournamentIds){
+        this.tournamentIds = tournamentIds;
         return this;
     }
 
@@ -165,11 +169,11 @@ public class TeamGridBuilder {
         newTeam.setIcon(VaadinIcon.PLUS.create());
 
         newTeam.addClickListener(click -> {
-            TeamDetails details = new TeamDetails(
+            TeamForm details = new TeamForm(
                     dbService.getTournamentRepository(), dbService.getTeamRepository(),null);
             Dialog dialog = details.getDialog();
             dialog.addOpenedChangeListener(change -> {
-                if (change.isOpened()) resetData();
+                if (!change.isOpened()) resetData();
             });
             dialog.setWidth("40%");
             view.add(dialog);
@@ -179,11 +183,18 @@ public class TeamGridBuilder {
     }
 
     public Button getRefreshButton(){
-        Button refresh = new Button();
+        if(refresh != null) return refresh;
 
+        refresh = new Button();
         refresh.addThemeVariants(ButtonVariant.LUMO_LARGE);
         refresh.setIcon(VaadinIcon.REFRESH.create());
-        refresh.addClickListener(buttonClickEvent -> resetData());
+        refresh.addClickListener(click ->{
+            List<TeamEntity> teams = new ArrayList<>();
+            for(Integer id : tournamentIds)
+                teams.addAll(dbService.getTeamRepository().findAllByTournamentId(id));
+            this.withDataProvider((new ListDataProvider<>(teams)));
+        });
+
         return refresh;
     }
 
@@ -198,7 +209,7 @@ public class TeamGridBuilder {
                 selectionEvent -> edit.setEnabled(selectionEvent.getFirstSelectedItem().isPresent()));
 
         edit.addClickListener(buttonClickEvent -> {
-            TeamDetails details = new TeamDetails(
+            TeamForm details = new TeamForm(
                     dbService.getTournamentRepository(), dbService.getTeamRepository(),
                     teamGrid.getSelectedItems().stream().findFirst().orElse(new TeamEntity()));
                     Dialog dialog = details.getDialog();

@@ -1,12 +1,11 @@
-package com.agh.leagueapp.views.teams;
+package com.agh.leagueapp.views.generalviews;
 
 import com.agh.leagueapp.backend.entities.TeamEntity;
+import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.utils.GridBuilders.TeamGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.views.MainLayout;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -22,6 +21,9 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @PageTitle("Team List")
@@ -41,14 +43,6 @@ public class AllTeamsView extends VerticalLayout {
         Grid<TeamEntity> teamGrid = teamGridBuilder.getTeamGrid();
         teamGrid.setWidth("50%");
 
-        ComponentEventListener<ClickEvent<Button>> event = new ComponentEventListener<ClickEvent<Button>>() {
-            @Override
-            public void onComponentEvent(ClickEvent<Button> buttonClickEvent) {
-                teamGrid.setDataProvider(new ListDataProvider<TeamEntity>(dbService.getTeamRepository().findAll()));
-            }
-        };
-
-        // TODO fix refresh buttons
         HorizontalLayout buttonPanel = teamGridBuilder.getButtonPanel(this);
         buttonPanel.setWidth("50%");
         buttonPanel.setPadding(false);
@@ -60,6 +54,10 @@ public class AllTeamsView extends VerticalLayout {
     private TeamGridBuilder buildTeamGrid(DbService dbService){
         TeamGridBuilder teamGridBuilder = new TeamGridBuilder(dbService);
 
+        List<Integer> tournamentIds = new ArrayList<>();
+        for(TournamentEntity entity : dbService.getTournamentRepository().findAll())
+            tournamentIds.add(entity.getTournamentId());
+
         teamGridBuilder
                 .withSelectionMode(Grid.SelectionMode.SINGLE)
                 .withIdColumn()
@@ -69,6 +67,7 @@ public class AllTeamsView extends VerticalLayout {
                 .withMailAddress(true,1)
                 .withPlayerCountColumn()
                 .withDataProvider(new ListDataProvider<>(dbService.getTeamRepository().findAll()))
+                .withDataByTournamentId(tournamentIds)
                 .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT);
 
         teamGridBuilder.getTeamGrid().addColumn(

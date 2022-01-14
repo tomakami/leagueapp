@@ -1,4 +1,4 @@
-package com.agh.leagueapp.views.teams;
+package com.agh.leagueapp.views.generalviews;
 
 import com.agh.leagueapp.backend.entities.PlayerEntity;
 import com.agh.leagueapp.backend.entities.TeamEntity;
@@ -7,7 +7,8 @@ import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.utils.GridBuilders.PlayerGridBuilder;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;

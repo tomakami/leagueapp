@@ -1,4 +1,4 @@
-package com.agh.leagueapp.views.tournaments;
+package com.agh.leagueapp.views.generalviews;
 
 import com.agh.leagueapp.backend.Navigator;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
@@ -6,7 +6,7 @@ import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.utils.GridBuilders.TournamentGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.views.MainLayout;
-import com.agh.leagueapp.views.tournament.TournamentView;
+import com.agh.leagueapp.views.detailedviews.TournamentOverview;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -24,13 +24,13 @@ import com.vaadin.flow.router.*;
 @PageTitle("Tournament List")
 @Route(value = LeagueAppConst.PAGE_TOURNAMENTS, layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
-public class TournamentListView
+public class AllTournamentsView
         extends VerticalLayout {
 
     private final DbService dbService;
     private final Navigator navigator;
 
-    public TournamentListView(DbService dbService, Navigator navigator) {
+    public AllTournamentsView(DbService dbService, Navigator navigator) {
         this.dbService = dbService;
         this.navigator = navigator;
 
@@ -72,7 +72,7 @@ public class TournamentListView
                     select.setIcon(new Icon(VaadinIcon.CHECK));
                     select.setWidth("2ep");
 
-                    RouterLink link = new RouterLink("", TournamentView.class,
+                    RouterLink link = new RouterLink("", TournamentOverview.class,
                             new RouteParameters("tournamentID", tournament.getTournamentId().toString()));
 
                     link.add(select);

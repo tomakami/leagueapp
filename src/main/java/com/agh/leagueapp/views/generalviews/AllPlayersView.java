@@ -1,4 +1,4 @@
-package com.agh.leagueapp.views.players;
+package com.agh.leagueapp.views.generalviews;
 
 
 import com.agh.leagueapp.backend.entities.PlayerEntity;
@@ -14,14 +14,17 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @PageTitle("Player List")
 @Route(value = LeagueAppConst.PAGE_PLAYERS, layout = MainLayout.class)
-public class PlayersView
+public class AllPlayersView
         extends VerticalLayout implements BeforeEnterObserver, BeforeLeaveObserver {
 
     private final DbService dbService;
 
-    public PlayersView(DbService dbService) {
+    public AllPlayersView(DbService dbService) {
         this.dbService = dbService;
 
     }
@@ -46,6 +49,8 @@ public class PlayersView
         add(new H2("List of all registered players"));
 
         PlayerGridBuilder playerGridBuilder = new PlayerGridBuilder(dbService);
+        List<Integer> teamIds = new ArrayList<>();
+        dbService.getTeamRepository().findAll().forEach(team -> teamIds.add(team.getTeamId()));
 
         playerGridBuilder
                 .withSelectionMode(Grid.SelectionMode.SINGLE)
@@ -55,7 +60,8 @@ public class PlayersView
                 .withTeamCardColumn(true, 1)
                 .withSummonerNameColumn(true, 1)
                 .withPlayerNameColumn(true, 1)
-                .withDataProvider(new ListDataProvider<>(dbService.getPlayerRepository().findAll()));
+                .withDataProvider(new ListDataProvider<>(dbService.getPlayerRepository().findAll()))
+                .withDataByTeamIds(teamIds);
 
         Grid<PlayerEntity> playerGrid = playerGridBuilder.getPlayerGrid();
         playerGrid.setWidth("45%");

@@ -1,17 +1,23 @@
-package com.agh.leagueapp.views.games;
+package com.agh.leagueapp.views.detailedviews;
 
 import com.agh.leagueapp.backend.Navigator;
 import com.agh.leagueapp.backend.entities.GameEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
+import com.agh.leagueapp.utils.GridBuilders.GameGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.views.MainLayout;
-import com.agh.leagueapp.views.tournaments.TournamentListView;
+import com.agh.leagueapp.views.generalviews.AllTournamentsView;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @PageTitle("Game List")
@@ -50,7 +56,7 @@ public class GameDetailsView
             tournamentID = parameter.get();
 
         if(!dbService.getTournamentRepository().existsById(Integer.valueOf(tournamentID))) {
-            event.forwardTo(TournamentListView.class);
+            event.forwardTo(AllTournamentsView.class);
         }
         else if (!forwarded){
             tournamentEntity = dbService.getTournamentRepository().findById(Integer.valueOf(tournamentID)).orElseThrow();
@@ -78,6 +84,28 @@ public class GameDetailsView
         listLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         listLayout.getStyle().set("border", "4px solid blue");
         listLayout.removeAll();
+
+        GameGridBuilder gameGridBuilder = new GameGridBuilder(dbService, tournamentEntity);
+
+        gameGridBuilder
+                .withIdColumn()
+                .withBlueTeamCardColumn(true, 1, true)
+                .withRedTeamCardColumn(true, 1, true)
+                .withSelectionMode(Grid.SelectionMode.SINGLE)
+                .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
+                .withDataProvider(new ListDataProvider<>(dbService.getGameRepository().findAllById(findGameIds())))
+                .withDataByTeamIds(findTeamIds());
+
+        final HorizontalLayout buttonPanel = gameGridBuilder.getButtonPanel(this);
+        final Grid<GameEntity> gameGrid = gameGridBuilder.getGameGrid();
+
+        buttonPanel.setWidth("90%");
+        buttonPanel.getStyle().set("border", "4px dotted red");
+        gameGrid.setWidth("90%");
+        gameGrid.getStyle().set("border", "4px dotted orange");
+
+        listLayout.setHorizontalComponentAlignment(Alignment.CENTER, gameGrid);
+        listLayout.add(buttonPanel, gameGrid);
     }
     private void setupDetailsLayout() {
         detailsLayout.removeAll();
@@ -88,5 +116,21 @@ public class GameDetailsView
             detailsLayout.add(new Paragraph("haha lol empty"));
             return;
         }
+    }
+
+    private List<Integer> findTeamIds(){
+        List<Integer> teams = new ArrayList<>();
+        dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())
+                .forEach(teamEntity -> teams.add(teamEntity.getTeamId()));
+        return teams;
+    }
+
+    private List<Integer> findGameIds(){
+        List<Integer> games = new ArrayList<>();
+        for (Integer id : findTeamIds())
+            dbService.getGameRepository().findAllByBlueTeamIdOrRedTeamId(id, id)
+                    .forEach(game -> games.add(game.getGameId()));
+
+        return games;
     }
 }

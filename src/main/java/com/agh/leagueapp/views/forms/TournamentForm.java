@@ -1,4 +1,4 @@
-package com.agh.leagueapp.views.tournaments;
+package com.agh.leagueapp.views.forms;
 
 import com.agh.leagueapp.backend.data.TournamentConfig;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
@@ -17,7 +17,7 @@ import com.vaadin.flow.data.validator.StringLengthValidator;
 import no.stelar7.api.r4j.basic.constants.api.regions.LeagueShard;
 
 
-public class TournamentDetails extends FormLayout {
+public class TournamentForm extends FormLayout {
 
     private final TournamentRepository tournamentRepository;
     private final TournamentEntity tournament;
@@ -35,7 +35,7 @@ public class TournamentDetails extends FormLayout {
 
     private final Binder<TournamentEntity> binder = new Binder<>(TournamentEntity.class);
 
-    public TournamentDetails(TournamentRepository tournamentRepository, TournamentEntity tournament){
+    public TournamentForm(TournamentRepository tournamentRepository, TournamentEntity tournament){
         this.tournamentRepository = tournamentRepository;
         isEditing = tournament != null;
         this.tournament = isEditing ? tournament : new TournamentEntity();
@@ -127,7 +127,6 @@ public class TournamentDetails extends FormLayout {
     }
 
     private void DeleteAction(){
-        // TODO: ask for confirmation before delete
         try{
             tournamentRepository.delete(binder.getBean());
         }catch (Exception e) {

@@ -1,9 +1,8 @@
-package com.agh.leagueapp.views.players;
+package com.agh.leagueapp.views.forms;
 
 import com.agh.leagueapp.backend.data.PlayerConfig;
 import com.agh.leagueapp.backend.entities.PlayerEntity;
 import com.agh.leagueapp.backend.entities.TeamEntity;
-import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.PlayerRepository;
 import com.agh.leagueapp.backend.repositories.TeamRepository;
 import com.agh.leagueapp.backend.repositories.TournamentRepository;
@@ -19,12 +18,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
-import com.vaadin.flow.data.validator.EmailValidator;
-import com.vaadin.flow.data.validator.RegexpValidator;
-import com.vaadin.flow.data.validator.StringLengthValidator;
 import no.stelar7.api.r4j.basic.constants.api.regions.LeagueShard;
 
-public class PlayerDetails extends FormLayout {
+public class PlayerForm extends FormLayout {
 
     private final TournamentRepository tournamentRepository;
     private final TeamRepository teamRepository;
@@ -53,8 +49,8 @@ public class PlayerDetails extends FormLayout {
 
     private final Binder<PlayerEntity> binder = new Binder<>(PlayerEntity.class);
 
-    public PlayerDetails(TournamentRepository tournamentRepository, TeamRepository teamRepository,
-                         PlayerRepository playerRepository, PlayerEntity player){
+    public PlayerForm(TournamentRepository tournamentRepository, TeamRepository teamRepository,
+                      PlayerRepository playerRepository, PlayerEntity player){
         this.tournamentRepository = tournamentRepository;
         this.teamRepository = teamRepository;
         this.playerRepository = playerRepository;

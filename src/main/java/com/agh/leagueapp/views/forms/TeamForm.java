@@ -1,4 +1,4 @@
-package com.agh.leagueapp.views.teams;
+package com.agh.leagueapp.views.forms;
 
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
@@ -19,7 +19,7 @@ import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
-public class TeamDetails extends FormLayout {
+public class TeamForm extends FormLayout {
 
     private final TournamentRepository tournamentRepository;
     private final TeamRepository teamRepository;
@@ -40,7 +40,7 @@ public class TeamDetails extends FormLayout {
 
     private final Binder<TeamEntity> binder = new Binder<>(TeamEntity.class);
 
-    public TeamDetails(TournamentRepository tournamentRepository, TeamRepository teamRepository, TeamEntity team){
+    public TeamForm(TournamentRepository tournamentRepository, TeamRepository teamRepository, TeamEntity team){
         this.tournamentRepository = tournamentRepository;
         this.teamRepository = teamRepository;
         isEditing = team != null;

@@ -4,7 +4,7 @@ import com.agh.leagueapp.backend.entities.PlayerEntity;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.utils.ViewBuildUtils;
-import com.agh.leagueapp.views.players.PlayerDetails;
+import com.agh.leagueapp.views.forms.PlayerForm;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,17 +18,19 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.selection.SelectionListener;
 
+import java.util.List;
 import java.util.Optional;
 
 public class PlayerGridBuilder {
 
     private Grid<PlayerEntity> playerGrid;
+    private List<Integer> teamIds;
+    private Button refresh;
     private final DbService dbService;
-
-    private DataProvider<PlayerEntity, ?> dataProvider;
 
     public PlayerGridBuilder(DbService dbService){
         this.dbService = dbService;
@@ -40,10 +42,11 @@ public class PlayerGridBuilder {
 
     public void reset(){
         this.playerGrid = new Grid<>(PlayerEntity.class, false);
+        this.refresh = null;
     }
 
     public void resetData(){
-        playerGrid.setDataProvider(dataProvider);
+        getRefreshButton().click();
     }
 
     public Grid<PlayerEntity> getPlayerGrid(){
@@ -64,8 +67,12 @@ public class PlayerGridBuilder {
     }
 
     public PlayerGridBuilder withDataProvider(DataProvider<PlayerEntity, ?> dataProvider){
-        this.dataProvider = dataProvider;
-        resetData();
+        playerGrid.setDataProvider(dataProvider);
+        return this;
+    }
+
+    public PlayerGridBuilder withDataByTeamIds(List<Integer> teamIds){
+        this.teamIds = teamIds;
         return this;
     }
 
@@ -135,7 +142,6 @@ public class PlayerGridBuilder {
         playerGrid.addColumn(
                         new ComponentRenderer<>(Span::new, (span, player) -> {
                             String name = player.getFirstName() + " " + player.getLastName();
-                            //VerticalLayout template = new VerticalLayout(new H5(name), new Paragraph(player.getIndexNumber()));
                             Div template = ViewBuildUtils.headerWithContent(
                                     name, "Index: " + player.getIndexNumber()
                             );
@@ -157,7 +163,7 @@ public class PlayerGridBuilder {
          newPlayer.setIcon(VaadinIcon.PLUS.create());
 
          newPlayer.addClickListener(click -> {
-             PlayerDetails details = new PlayerDetails(
+             PlayerForm details = new PlayerForm(
                      dbService.getTournamentRepository(), dbService.getTeamRepository(),
                      dbService.getPlayerRepository(), null);
              Dialog dialog = details.getDialog();
@@ -172,12 +178,15 @@ public class PlayerGridBuilder {
     }
 
     public Button getRefreshButton(){
-        Button refresh = new Button();
+        if(refresh != null) return refresh;
 
+        refresh = new Button();
         refresh.addThemeVariants(ButtonVariant.LUMO_LARGE);
         refresh.setIcon(VaadinIcon.REFRESH.create());
-        refresh.addClickListener(buttonClickEvent -> {
-            resetData();
+        refresh.addClickListener(click ->{
+            this.withDataProvider((new ListDataProvider<>(
+                    dbService.getPlayerRepository().findPlayerEntitiesByTeamIdIsIn(teamIds)
+            )));
         });
         return refresh;
     }
@@ -216,7 +225,7 @@ public class PlayerGridBuilder {
                 selectionEvent -> edit.setEnabled(selectionEvent.getFirstSelectedItem().isPresent()));
 
         edit.addClickListener(buttonClickEvent -> {
-            PlayerDetails details = new PlayerDetails(
+            PlayerForm details = new PlayerForm(
                     dbService.getTournamentRepository(), dbService.getTeamRepository(), dbService.getPlayerRepository(),
                     playerGrid.getSelectedItems().stream().findFirst().orElse(new PlayerEntity()));
             Dialog dialog = details.getDialog();

@@ -7,9 +7,12 @@ import javax.persistence.*;
 public class GameEntity {
 
     private Integer gameId;
+    private boolean blue_win;
+    private boolean ended;
     private Integer blueTeamId;
     private Integer redTeamId;
     private String tournamentCode;
+    private String match_id;
     private TeamEntity teamByBlueTeamId;
     private TeamEntity teamByRedTeamId;
 
@@ -60,6 +63,36 @@ public class GameEntity {
 
     public void setTournamentCode(String tournamentCode) {
         this.tournamentCode = tournamentCode;
+    }
+
+    @Basic
+    @Column(name = "match_id", nullable = true, length = -1)
+    public String getMatchId() {
+        return match_id;
+    }
+
+    public void setMatchId(String match_id) {
+        this.match_id = match_id;
+    }
+
+    @Basic
+    @Column(name = "blue_win", nullable = true)
+    public boolean getBlueWin() {
+        return blue_win;
+    }
+
+    public void setBlueWin(boolean blue_win) {
+        this.blue_win = blue_win;
+    }
+
+    @Basic
+    @Column(name = "ended", nullable = true)
+    public boolean getEnded() {
+        return ended;
+    }
+
+    public void setEnded(boolean ended) {
+        this.ended = ended;
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.agh.leagueapp.utils.GridBuilders;
 
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
-import com.agh.leagueapp.views.tournaments.TournamentDetails;
+import com.agh.leagueapp.views.forms.TournamentForm;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -14,15 +14,16 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.selection.SelectionListener;
 
 public class TournamentGridBuilder {
 
     private Grid<TournamentEntity> tournamentGrid;
-    private final DbService dbService;
+    private Button refresh;
 
-    private DataProvider<TournamentEntity, ?> dataProvider;
+    private final DbService dbService;
 
     public TournamentGridBuilder(DbService dbService){
         this.dbService = dbService;
@@ -34,10 +35,11 @@ public class TournamentGridBuilder {
 
     public void reset(){
         this.tournamentGrid = new Grid<>(TournamentEntity.class, false);
+        this.refresh = null;
     }
 
     public void resetData(){
-        tournamentGrid.setDataProvider(dataProvider);
+        getRefreshButton().click();
     }
 
     public Grid<TournamentEntity> getTournamentGrid(){
@@ -58,8 +60,7 @@ public class TournamentGridBuilder {
     }
 
     public TournamentGridBuilder withDataProvider(DataProvider<TournamentEntity, ?> dataProvider){
-        this.dataProvider = dataProvider;
-        resetData();
+        tournamentGrid.setDataProvider(dataProvider);
         return this;
     }
 
@@ -132,7 +133,7 @@ public class TournamentGridBuilder {
         newTournament.setIcon(VaadinIcon.PLUS.create());
 
         newTournament.addClickListener(click -> {
-            TournamentDetails details = new TournamentDetails(
+            TournamentForm details = new TournamentForm(
                     dbService.getTournamentRepository(),null);
             Dialog dialog = details.getDialog();
             dialog.addOpenedChangeListener(change -> {
@@ -146,11 +147,14 @@ public class TournamentGridBuilder {
     }
 
     public Button getRefreshButton(){
-        Button refresh = new Button();
+        if(refresh != null) return refresh;
 
+        refresh = new Button();
         refresh.addThemeVariants(ButtonVariant.LUMO_LARGE);
         refresh.setIcon(VaadinIcon.REFRESH.create());
-        refresh.addClickListener(buttonClickEvent -> resetData());
+        refresh.addClickListener(click -> {
+            this.withDataProvider(new ListDataProvider<>(dbService.getTournamentRepository().findAll()));
+        });
         return refresh;
     }
 
@@ -165,7 +169,7 @@ public class TournamentGridBuilder {
                 selectionEvent -> edit.setEnabled(selectionEvent.getFirstSelectedItem().isPresent()));
 
         edit.addClickListener(buttonClickEvent -> {
-            TournamentDetails details = new TournamentDetails(dbService.getTournamentRepository(),
+            TournamentForm details = new TournamentForm(dbService.getTournamentRepository(),
                             tournamentGrid.getSelectedItems().stream().findFirst().orElse(new TournamentEntity()));
             Dialog dialog = details.getDialog();
             dialog.addOpenedChangeListener(change -> {
