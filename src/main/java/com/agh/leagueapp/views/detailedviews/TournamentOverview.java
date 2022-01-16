@@ -1,10 +1,12 @@
 package com.agh.leagueapp.views.detailedviews;
 
 import com.agh.leagueapp.backend.Navigator;
+import com.agh.leagueapp.backend.entities.GameEntity;
 import com.agh.leagueapp.backend.entities.PlayerEntity;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
+import com.agh.leagueapp.utils.GridBuilders.GameGridBuilder;
 import com.agh.leagueapp.utils.GridBuilders.PlayerGridBuilder;
 import com.agh.leagueapp.utils.GridBuilders.TeamGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
@@ -25,9 +27,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @PageTitle("Tournament List")
 @Route(value = LeagueAppConst.PAGE_TOURNAMENTS + "/:tournamentID?/overview", layout = MainLayout.class)
@@ -85,9 +85,7 @@ public class TournamentOverview
 
     private void setupHeaderLayout(){
         Button detailsButton = new Button("Details");
-        detailsButton.addClickListener(buttonClickEvent -> {
-            this.details.open();
-        });
+        detailsButton.addClickListener(buttonClickEvent -> this.details.open());
         detailsButton.setWidth("10em");
 
         Span filler = new Span();
@@ -119,7 +117,6 @@ public class TournamentOverview
 
     private void setupMainLayout(){
         VerticalLayout leftPart = new VerticalLayout();
-        leftPart.getStyle().set("border", "4px dotted green");
         leftPart.setWidthFull();
         leftPart.setHeightFull();
         leftPart.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -129,7 +126,6 @@ public class TournamentOverview
         );
 
         VerticalLayout middlePart = new VerticalLayout();
-        middlePart.getStyle().set("border", "4px dotted brown");
         middlePart.setWidthFull();
         middlePart.setHeightFull();
         middlePart.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -139,17 +135,19 @@ public class TournamentOverview
         );
 
         VerticalLayout rightPart = new VerticalLayout();
-        rightPart.getStyle().set("border", "4px dotted blue");
         rightPart.setWidthFull();
         rightPart.setHeightFull();
+        rightPart.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        rightPart.add(
+                setupLinkButton("See detailed game list", GameDetailsView.class, new RouteParameters("tournamentID", tournamentID)),
+                setupGameGrid()
+        );
+
 
         HorizontalLayout mainLayout = new HorizontalLayout();
-        mainLayout.getStyle().set("border", "4px dotted red");
         mainLayout.setWidthFull();
         mainLayout.setHeightFull();
-
-        mainLayout.add(leftPart,middlePart,rightPart);
-
+        mainLayout.add(leftPart, middlePart, rightPart);
         this.add(mainLayout);
     }
 
@@ -167,7 +165,10 @@ public class TournamentOverview
                         dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())))
                 .withDataByTournamentId(List.of(tournamentEntity.getTournamentId()));
 
-        return teamGridBuilder.getTeamGrid();
+        Grid<TeamEntity> teamGrid = teamGridBuilder.getTeamGrid();
+        teamGrid.getStyle().set("border", "1px solid grey");
+
+        return teamGrid;
     }
 
     private Grid<PlayerEntity> setupPlayerGrid(){
@@ -178,17 +179,38 @@ public class TournamentOverview
                 .forEach(teamEntity -> teams.add(teamEntity.getTeamId()));
 
         playerGridBuilder
-                .withSelectionMode(Grid.SelectionMode.NONE)
-                .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
                 .withRoleColumn("2em", "4em")
                 .withTeamTagColumn()
                 .withSummonerNameColumn(true, 1)
                 .withPlayerNameColumn(true, 1)
+                .withSelectionMode(Grid.SelectionMode.NONE)
+                .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
                 .withDataProvider(new ListDataProvider<>(
                         dbService.getPlayerRepository().findPlayerEntitiesByTeamIdIsIn(teams)
                 ));
 
-        return playerGridBuilder.getPlayerGrid();
+        Grid<PlayerEntity> playerGrid = playerGridBuilder.getPlayerGrid();
+        playerGrid.getStyle().set("border", "1px solid grey");
+
+        return playerGrid;
+    }
+
+    private Grid<GameEntity> setupGameGrid(){
+        GameGridBuilder gameGridBuilder = new GameGridBuilder(dbService, tournamentEntity);
+
+        gameGridBuilder
+                .withStatusColumn()
+                .withBlueTeamCardColumn(true, 1, true)
+                .withRedTeamCardColumn(true, 1, true)
+                .withSelectionMode(Grid.SelectionMode.NONE)
+                .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
+                .withDataProvider(new ListDataProvider<>(dbService.getGameRepository().findAllById(findGameIds())))
+                .withDataByTeamIds(findTeamIds());
+
+        Grid<GameEntity> gameGrid = gameGridBuilder.getGameGrid();
+        gameGrid.getStyle().set("border", "1px solid grey");
+
+        return gameGrid;
     }
 
     private RouterLink setupLinkButton(String t, Class<? extends Component> c, RouteParameters params){
@@ -227,5 +249,20 @@ public class TournamentOverview
         details.add(layout);
     }
 
+    private List<Integer> findTeamIds(){
+        List<Integer> teams = new ArrayList<>();
+        dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())
+                .forEach(teamEntity -> teams.add(teamEntity.getTeamId()));
+        return teams;
+    }
+
+    private List<Integer> findGameIds(){
+        List<Integer> games = new ArrayList<>();
+        for (Integer id : findTeamIds())
+            dbService.getGameRepository().findAllByBlueTeamIdOrRedTeamId(id, id)
+                    .forEach(game -> games.add(game.getGameId()));
+
+        return games;
+    }
 
 }

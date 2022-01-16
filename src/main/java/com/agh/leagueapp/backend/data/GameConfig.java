@@ -5,7 +5,6 @@ import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.utils.TestUtils;
-import com.merakianalytics.orianna.types.common.Position;
 import no.stelar7.api.r4j.basic.APICredentials;
 import no.stelar7.api.r4j.basic.constants.types.lol.*;
 import no.stelar7.api.r4j.impl.R4J;

@@ -192,13 +192,17 @@ public class GameGridBuilder {
                 new ComponentRenderer<>(Span::new, (span, game) -> {
                     Integer blueTeamId = game.getBlueTeamId();
 
-                    if(!game.getEnded()) span.setText("TBD");
-                    else span.setText(
+                    if(!game.getEnded()) {
+                        span.setText("TBD");
+                        return;
+                    }
+
+                    span.setText(
                             (ownTeamId.equals(blueTeamId) && game.getBlueWin())
                                     || (!ownTeamId.equals(blueTeamId) && !game.getBlueWin())
                                     ? "Win" : "Lose");
 
-
+                    span.getStyle().set("font-weight", "bold");
                     span.getStyle().set("background-color",
                             (ownTeamId.equals(blueTeamId) && game.getBlueWin())
                                     || (!ownTeamId.equals(blueTeamId) && !game.getBlueWin())
@@ -260,6 +264,18 @@ public class GameGridBuilder {
                 .setHeader("Opponent")
                 .setFlexGrow(flexGrow)
                 .setAutoWidth(autoWidth);
+        return this;
+    }
+
+    public GameGridBuilder withStatusColumn(){
+        gameGrid.addColumn(
+                        new ComponentRenderer<>(Span::new, (span, game) -> {
+                            if(game.getEnded()) span.setText("Ended");
+                            else span.setText("Scheduled");
+                        }
+                        )).setHeader("Status")
+                .setWidth("5em");
+
         return this;
     }
 

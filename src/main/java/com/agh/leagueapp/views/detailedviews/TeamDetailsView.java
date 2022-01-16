@@ -6,6 +6,7 @@ import com.agh.leagueapp.backend.entities.PlayerEntity;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
+import com.agh.leagueapp.utils.GridBuilders.GameGridBuilder;
 import com.agh.leagueapp.utils.GridBuilders.PlayerGridBuilder;
 import com.agh.leagueapp.utils.GridBuilders.TeamGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
@@ -16,7 +17,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -93,7 +94,6 @@ public class TeamDetailsView
     private void setupListLayout(){
         listLayout.setWidth("40%");
         listLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        listLayout.getStyle().set("border", "4px solid blue");
         listLayout.removeAll();
 
         final TeamGridBuilder teamGridBuilder = new TeamGridBuilder(dbService);
@@ -129,9 +129,8 @@ public class TeamDetailsView
                 .setWidth("5em").setFlexGrow(0);
 
         buttonPanel.setWidth("80%");
-        buttonPanel.getStyle().set("border","4px solid pink");
         teamGrid.setWidth("80%");
-        teamGrid.getStyle().set("border","4px solid pink");
+        teamGrid.getStyle().set("border", "1px solid grey");
 
         listLayout.setHorizontalComponentAlignment(Alignment.CENTER, teamGrid);
         listLayout.add(buttonPanel, teamGrid);
@@ -140,10 +139,12 @@ public class TeamDetailsView
         detailsLayout.removeAll();
         gameGrid.removeAllColumns();
         detailsLayout.setWidth("60%");
-        detailsLayout.getStyle().set("border", "4px dotted green");
 
         if(this.teamEntity == null){
-            detailsLayout.add(new Paragraph("haha lol empty"));
+            H2 info = new H2("Choose Team to see detailed information.");
+            info.setSizeFull();
+            info.getStyle().set("text-align", "center");
+            detailsLayout.add(info);
             return;
         }
 
@@ -157,16 +158,11 @@ public class TeamDetailsView
 
         HorizontalLayout listPanel = new HorizontalLayout();
         listPanel.setSizeFull();
-        listPanel.getStyle().set("border","4px dotted purple");
-
 
         VerticalLayout playerListLayout = setupPlayerList();
-
-        playerListLayout.getStyle().set("border","4px solid pink");
         playerListLayout.setWidth("80%");
 
         VerticalLayout gameListLayout = setupGameList();
-        gameListLayout.getStyle().set("border","4px solid magenta");
         gameListLayout.setWidthFull();
 
         listPanel.add(
@@ -195,31 +191,27 @@ public class TeamDetailsView
 
         buttonPanel.setWidthFull();
         playerGrid.setWidthFull();
+        playerGrid.getStyle().set("border", "1px solid grey");
 
         return new VerticalLayout(buttonPanel, playerGrid);
     }
 
-    private void setupGameGrid(){
-        gameGrid.setWidthFull();
-        gameGrid.setSelectionMode(Grid.SelectionMode.NONE);
-        gameGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT);
-
-        gameGrid.addColumn(
-                        new ComponentRenderer<>(Span::new, (span, game) -> {
-                            span.add(new Paragraph(game.getBlueTeamId() + " vs " + game.getRedTeamId()));
-                        })).setHeader("vs")
-                .setWidth("4em").setFlexGrow(0);
-
-        gameGrid.setDataProvider(
-                new ListDataProvider<>(
+    private VerticalLayout setupGameList(){
+        final GameGridBuilder gameGridBuilder = new GameGridBuilder(dbService, tournamentEntity);
+        gameGridBuilder
+                .withStatusColumn()
+                .withResultColumn(teamEntity.getTeamId())
+                .withOpponentCardColumn(true, 1, teamEntity.getTeamId(), true)
+                .withSelectionMode(Grid.SelectionMode.NONE)
+                .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
+                .withDataProvider(new ListDataProvider<>(
                         dbService.getGameRepository().
                                 findAllByBlueTeamIdOrRedTeamId
                                         (teamEntity.getTeamId(), teamEntity.getTeamId())));
-    }
 
-    private VerticalLayout setupGameList(){
-        setupGameGrid();
+        final Grid<GameEntity> gameGrid = gameGridBuilder.getGameGrid();
+        gameGrid.getStyle().set("border", "1px solid grey");
+
         return new VerticalLayout(gameGrid);
     }
-
 }

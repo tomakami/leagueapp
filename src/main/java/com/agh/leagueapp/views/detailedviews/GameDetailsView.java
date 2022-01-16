@@ -6,14 +6,21 @@ import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
 import com.agh.leagueapp.utils.GridBuilders.GameGridBuilder;
 import com.agh.leagueapp.utils.LeagueAppConst;
+import com.agh.leagueapp.utils.ViewBuildUtils;
 import com.agh.leagueapp.views.MainLayout;
 import com.agh.leagueapp.views.generalviews.AllTournamentsView;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 
 import java.util.ArrayList;
@@ -82,7 +89,6 @@ public class GameDetailsView
     private void setupListLayout() {
         listLayout.setWidth("40%");
         listLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        listLayout.getStyle().set("border", "4px solid blue");
         listLayout.removeAll();
 
         GameGridBuilder gameGridBuilder = new GameGridBuilder(dbService, tournamentEntity);
@@ -99,10 +105,25 @@ public class GameDetailsView
         final HorizontalLayout buttonPanel = gameGridBuilder.getButtonPanel(this);
         final Grid<GameEntity> gameGrid = gameGridBuilder.getGameGrid();
 
+        gameGrid.addColumn(
+                        new ComponentRenderer<>(Span::new, (span, team) -> {
+                            Button details = new Button();
+                            details.setIcon(VaadinIcon.PLAY.create());
+                            details.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SUCCESS);
+                            details.addClickListener(click -> {
+                                this.gameEntity = team;
+                                setupDetailsLayout();
+                            });
+
+                            span.add(details);
+                            span.getStyle().set("text-align","center");
+                        }
+                        )).setHeader("Details")
+                .setWidth("5em").setFlexGrow(0);
+
         buttonPanel.setWidth("90%");
-        buttonPanel.getStyle().set("border", "4px dotted red");
         gameGrid.setWidth("90%");
-        gameGrid.getStyle().set("border", "4px dotted orange");
+        gameGrid.getStyle().set("border", "1px solid gray");
 
         listLayout.setHorizontalComponentAlignment(Alignment.CENTER, gameGrid);
         listLayout.add(buttonPanel, gameGrid);
@@ -110,12 +131,32 @@ public class GameDetailsView
     private void setupDetailsLayout() {
         detailsLayout.removeAll();
         detailsLayout.setWidth("60%");
-        detailsLayout.getStyle().set("border", "4px dotted green");
 
-        if (this.gameEntity == null) {
-            detailsLayout.add(new Paragraph("haha lol empty"));
+        if (this.gameEntity == null){
+            H2 info = new H2("Choose Game to see detailed information.");
+            info.setSizeFull();
+            info.getStyle().set("text-align", "center");
+            detailsLayout.add(info);
             return;
         }
+
+        HorizontalLayout infoPanel = new HorizontalLayout();
+        infoPanel.setJustifyContentMode(JustifyContentMode.EVENLY);
+        infoPanel.setWidth("80%");
+        infoPanel.add(
+                ViewBuildUtils.headerWithContent("Match ID", gameEntity.getMatchId()),
+                ViewBuildUtils.headerWithContent("Tournament Code", gameEntity.getTournamentCode()),
+                ViewBuildUtils.headerWithContent("Blue Team", dbService.getTeamRepository().findById(gameEntity.getBlueTeamId()).get().getTeamName()),
+                ViewBuildUtils.headerWithContent("Red Team", dbService.getTeamRepository().findById(gameEntity.getRedTeamId()).get().getTeamName()));
+
+        HorizontalLayout listPanel = new HorizontalLayout();
+        listPanel.setSizeFull();
+        listPanel.getStyle().set("border","1px solid gray");
+
+        listPanel.add(
+        );
+
+        detailsLayout.add(infoPanel, listPanel);
     }
 
     private List<Integer> findTeamIds(){
