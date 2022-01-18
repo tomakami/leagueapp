@@ -3,7 +3,6 @@ package com.agh.leagueapp.backend.entities;
 import no.stelar7.api.r4j.basic.constants.api.regions.LeagueShard;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Entity
 @Table(name = "tournament", schema = "public", catalog = "league_db")

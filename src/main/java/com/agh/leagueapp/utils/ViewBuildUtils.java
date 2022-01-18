@@ -2,6 +2,8 @@ package com.agh.leagueapp.utils;
 
 import com.agh.leagueapp.backend.entities.PlayerEntity;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 public class ViewBuildUtils {
@@ -50,5 +52,21 @@ public class ViewBuildUtils {
                     roleIcon.setHeight(size);
                     span.add(roleIcon);
                 });
+    }
+
+    public static HorizontalLayout StatRow(String value1, String title, String value2){
+        HorizontalLayout row = new HorizontalLayout();
+        row.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        row.setWidthFull();
+        row.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+
+        H4 middle = new H4(title);
+        middle.setWidth("25%");
+        middle.getStyle().set("text-align", "center");
+        row.add(new Paragraph(value1),
+                middle,
+                new Paragraph(value2)
+        );
+        return row;
     }
 }

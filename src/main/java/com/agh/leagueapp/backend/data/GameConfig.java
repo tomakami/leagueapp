@@ -6,10 +6,15 @@ import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.utils.LeagueAppConst;
 import com.agh.leagueapp.utils.TestUtils;
 import no.stelar7.api.r4j.basic.APICredentials;
-import no.stelar7.api.r4j.basic.constants.types.lol.*;
+import no.stelar7.api.r4j.basic.constants.api.regions.LeagueShard;
+import no.stelar7.api.r4j.basic.constants.types.lol.TeamType;
+import no.stelar7.api.r4j.basic.constants.types.lol.TournamentMapType;
+import no.stelar7.api.r4j.basic.constants.types.lol.TournamentPickType;
+import no.stelar7.api.r4j.basic.constants.types.lol.TournamentSpectatorType;
 import no.stelar7.api.r4j.impl.R4J;
 import no.stelar7.api.r4j.impl.lol.raw.MatchV5API;
 import no.stelar7.api.r4j.impl.lol.raw.TournamentAPI;
+import no.stelar7.api.r4j.pojo.lol.match.v5.LOLMatch;
 import no.stelar7.api.r4j.pojo.lol.tournament.TournamentCodeParameters;
 import no.stelar7.api.r4j.pojo.lol.tournament.TournamentCodeUpdateParameters;
 
@@ -21,7 +26,6 @@ public class GameConfig {
                                               TeamEntity blueTeam,
                                               TeamEntity redTeam){
 
-        MatchV5API matchAPI = new R4J(new APICredentials(LeagueAppConst.API_KEY)).getLoLAPI().getMatchAPI();
         TournamentAPI tournamentAPI = new R4J(new APICredentials(LeagueAppConst.API_KEY)).getLoLAPI().getTournamentAPI(LeagueAppConst.USE_STUB);
 
         TournamentCodeParameters params = new TournamentCodeParameters(
@@ -51,4 +55,17 @@ public class GameConfig {
         return entity;
     }
 
+    public static GameEntity SimulateResult(GameEntity entity, LeagueShard  region){
+        MatchV5API matchV5API = new R4J(new APICredentials(LeagueAppConst.API_KEY)).getLoLAPI().getMatchAPI();
+
+        LOLMatch match = matchV5API.getMatch(region.toRegionShard(), entity.getMatchId());
+
+        entity.setBlueWin(
+                (match.getTeams().get(0).getTeamId() == TeamType.BLUE &&
+                        match.getTeams().get(0).didWin())
+        );
+        entity.setEnded(true);
+
+        return entity;
+    }
 }

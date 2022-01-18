@@ -105,6 +105,7 @@ public class TeamDetailsView
                 .withTeamNameColumn(true, 1)
                 .withMailAddress(true, 1)
                 .withPlayerCountColumn()
+                .withWinLoseColumn()
                 .withDataProvider(new ListDataProvider<>(
                         dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())))
                 .withDataByTournamentId(List.of(this.tournamentEntity.getTournamentId()));
@@ -182,6 +183,7 @@ public class TeamDetailsView
                 .withSummonerNameColumn(true, 1)
                 .withPlayerNameColumn(true, 1)
                 .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
+                .withDataByTeamIds(List.of(teamEntity.getTeamId()))
                 .withDataProvider(new ListDataProvider<>(
                         dbService.getPlayerRepository().findPlayerEntitiesByTeamId(
                                 teamEntity.getTeamId())));

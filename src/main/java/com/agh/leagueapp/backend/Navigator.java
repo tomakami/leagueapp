@@ -8,7 +8,6 @@ public class Navigator {
     private static Integer tournamentID;
 
     public Navigator(){
-        System.out.println("Starting navigator");
         setTournamentID(0);
     }
 

@@ -1,5 +1,6 @@
 package com.agh.leagueapp.utils.GridBuilders;
 
+import com.agh.leagueapp.backend.entities.GameEntity;
 import com.agh.leagueapp.backend.entities.TeamEntity;
 import com.agh.leagueapp.backend.entities.TournamentEntity;
 import com.agh.leagueapp.backend.repositories.DbService;
@@ -21,6 +22,7 @@ import com.vaadin.flow.data.selection.SelectionListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -154,7 +156,30 @@ public class TeamGridBuilder {
                     span.getStyle().set("text-align", "center");
                     span.setText(temp);
                 }))
-                .setHeader("Games Played")
+                .setHeader("Game count")
+                .setAutoWidth(true);
+        return this;
+    }
+
+    public TeamGridBuilder withWinLoseColumn(){
+
+        teamGrid.addColumn(
+                        new ComponentRenderer<>(Span::new, (span, team) -> {
+                            int wins=0,loses=0;
+                            List<GameEntity> gameList = dbService.getGameRepository().findAllByBlueTeamIdOrRedTeamId(team.getTeamId(),team.getTeamId());
+                            for(GameEntity game : gameList) {
+                                if (!game.getEnded()) continue;
+                                if ((game.getBlueWin() && Objects.equals(game.getBlueTeamId(), team.getTeamId())) ||
+                                        (!game.getBlueWin() && Objects.equals(game.getRedTeamId(), team.getTeamId())))
+                                    wins += 1;
+                                else
+                                    loses+=1;
+                            }
+
+                            span.getStyle().set("text-align", "center");
+                            span.setText(wins + " / " + loses);
+                        }))
+                .setHeader("Win / Lose")
                 .setAutoWidth(true);
         return this;
     }

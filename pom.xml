@@ -169,13 +169,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Not going to use it but leaving it here for sake of laziness -->
-        <dependency>
-            <groupId>com.merakianalytics.orianna</groupId>
-            <artifactId>orianna</artifactId>
-            <version>4.0.0-rc8</version>
-        </dependency>
-
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

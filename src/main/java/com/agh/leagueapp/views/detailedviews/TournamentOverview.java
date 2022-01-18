@@ -27,7 +27,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @PageTitle("Tournament List")
 @Route(value = LeagueAppConst.PAGE_TOURNAMENTS + "/:tournamentID?/overview", layout = MainLayout.class)
@@ -161,6 +163,7 @@ public class TournamentOverview
                 .withTeamNameColumn(true, 1)
                 .withPlayerCountColumn()
                 .withGameCountColumn()
+                .withWinLoseColumn()
                 .withDataProvider(new ListDataProvider<>(
                         dbService.getTeamRepository().findAllByTournamentId(tournamentEntity.getTournamentId())))
                 .withDataByTournamentId(List.of(tournamentEntity.getTournamentId()));
@@ -201,6 +204,7 @@ public class TournamentOverview
         gameGridBuilder
                 .withStatusColumn()
                 .withBlueTeamCardColumn(true, 1, true)
+                .withWinnerTagColumn()
                 .withRedTeamCardColumn(true, 1, true)
                 .withSelectionMode(Grid.SelectionMode.NONE)
                 .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)

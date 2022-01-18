@@ -214,6 +214,26 @@ public class GameGridBuilder {
         return this;
     }
 
+    public GameGridBuilder withWinnerTagColumn(){
+        gameGrid.addColumn(
+                        new ComponentRenderer<>(Span::new, (span, game) -> {
+                            span.getStyle().set("text-align", "center");
+                            span.setWidthFull();
+                            if(!game.getEnded()) {
+                                span.setText("TBD");
+                                return;
+                            }
+
+                            Integer winnerId = game.getBlueWin() ? game.getBlueTeamId() : game.getRedTeamId();
+
+                            span.setText(dbService.getTeamRepository().findById(winnerId).get().getTeamTag() + " win");
+                        }
+                        )).setHeader("Winner")
+                .setWidth("4em");
+
+        return this;
+    }
+
     public GameGridBuilder withOpponentNameColumn(boolean autoWidth, int flexGrow, Integer ownTeamId, boolean withResultColor){
         gameGrid.addColumn(
                         new ComponentRenderer<>(Span::new, (span, game) -> {

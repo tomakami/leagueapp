@@ -1,11 +1,9 @@
 package com.agh.leagueapp.utils;
 
 import no.stelar7.api.r4j.basic.APICredentials;
-import no.stelar7.api.r4j.basic.constants.api.regions.LeagueShard;
 import no.stelar7.api.r4j.basic.constants.types.lol.GameQueueType;
 import no.stelar7.api.r4j.impl.R4J;
 import no.stelar7.api.r4j.impl.lol.builders.matchv5.match.MatchListBuilder;
-import no.stelar7.api.r4j.impl.lol.raw.MatchV5API;
 import no.stelar7.api.r4j.impl.lol.raw.SummonerAPI;
 import no.stelar7.api.r4j.pojo.lol.summoner.Summoner;
 

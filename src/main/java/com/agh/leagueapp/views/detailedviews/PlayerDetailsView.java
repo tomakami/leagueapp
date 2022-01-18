@@ -17,7 +17,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -177,8 +176,8 @@ public class PlayerDetailsView
         final GameGridBuilder gameGridBuilder = new GameGridBuilder(dbService, tournamentEntity);
         gameGridBuilder
                 .withIdColumn()
-                .withBlueTeamCardColumn(true, 1, true)
-                .withRedTeamCardColumn(true, 1, true)
+                .withResultColumn(playerEntity.getTeamId())
+                .withOpponentCardColumn(true, 1, playerEntity.getTeamId(), false)
                 .withSelectionMode(Grid.SelectionMode.NONE)
                 .withThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_WRAP_CELL_CONTENT)
                 .withDataProvider(new ListDataProvider<>(

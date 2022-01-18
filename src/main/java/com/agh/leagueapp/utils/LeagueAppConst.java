@@ -1,7 +1,7 @@
 package com.agh.leagueapp.utils;
 
-import com.vaadin.flow.component.html.Image;
 import no.stelar7.api.r4j.basic.constants.api.regions.LeagueShard;
+import no.stelar7.api.r4j.basic.constants.types.lol.LaneType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +16,7 @@ public class LeagueAppConst {
     public static final String PAGE_TEAMS = "teams";
     public static final String PAGE_PLAYERS = "players";
 
-    public static final String API_KEY = "RGAPI-b18adb8a-19f6-404e-b2a8-ef7305869e14";
+    public static final String API_KEY = "RGAPI-cc199505-0a61-444d-8915-ad59fd5fecf9";
 
     public static final boolean USE_STUB = true;
     public static final LeagueShard TEST_SUMMONER_REGION = LeagueShard.EUW1;
@@ -35,4 +35,6 @@ public class LeagueAppConst {
     public static final String UTILITY = "positionIcons/icon-position-utility.png";
     public static final String FILL = "positionIcons/icon-position-fill.png";
     public static final String UNSELECTED = "positionIcons/icon-position-unselected.png";
+
+    public static final List<LaneType> LANES = List.of(LaneType.TOP, LaneType.JUNGLE, LaneType.MID, LaneType.BOT, LaneType.UITILITY);
 }
