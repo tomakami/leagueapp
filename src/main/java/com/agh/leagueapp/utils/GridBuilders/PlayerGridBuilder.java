@@ -37,22 +37,18 @@ public class PlayerGridBuilder {
         this.reset();
     }
 
-
     // General methods
 
     public void reset(){
         this.playerGrid = new Grid<>(PlayerEntity.class, false);
         this.refresh = null;
     }
-
     public void resetData(){
         getRefreshButton().click();
     }
-
     public Grid<PlayerEntity> getPlayerGrid(){
         return playerGrid;
     }
-
 
     // Attributes
 
@@ -60,17 +56,14 @@ public class PlayerGridBuilder {
         playerGrid.setSelectionMode(selectionMode);
         return this;
     }
-
     public PlayerGridBuilder withThemeVariants(GridVariant... variants){
         playerGrid.addThemeVariants(variants);
         return this;
     }
-
     public PlayerGridBuilder withDataProvider(DataProvider<PlayerEntity, ?> dataProvider){
         playerGrid.setDataProvider(dataProvider);
         return this;
     }
-
     public PlayerGridBuilder withDataByTeamIds(List<Integer> teamIds){
         this.teamIds = teamIds;
         return this;
@@ -78,19 +71,16 @@ public class PlayerGridBuilder {
 
 
     // Columns
-
     public PlayerGridBuilder withIdColumn(){
         playerGrid.addColumn(PlayerEntity::getPlayerId).setHeader("ID")
                 .setWidth("3em").setFlexGrow(0);
         return this;
     }
-
     public PlayerGridBuilder withRoleColumn(String size, String columnWidth){
         playerGrid.addColumn(ViewBuildUtils.roleIconRenderer(size)).setHeader("Role")
                 .setWidth(columnWidth).setFlexGrow(0);
         return this;
     }
-
     public PlayerGridBuilder withTeamCardColumn(boolean autoWidth, int flexGrow){
         playerGrid.addColumn(
                         new ComponentRenderer<>(Span::new, (span, player) -> {
@@ -107,7 +97,6 @@ public class PlayerGridBuilder {
                 .setAutoWidth(autoWidth);
         return this;
     }
-
     public PlayerGridBuilder withTeamTagColumn(){
         playerGrid.addColumn(
                         new ComponentRenderer<>(Span::new, (span, player) -> {
@@ -118,7 +107,6 @@ public class PlayerGridBuilder {
                 .setAutoWidth(true);
         return this;
     }
-
     public PlayerGridBuilder withTeamNameColumn(boolean autoWidth, int flexGrow){
         playerGrid.addColumn(
                         new ComponentRenderer<>(Span::new, (span, player) -> {
@@ -130,14 +118,12 @@ public class PlayerGridBuilder {
                 .setAutoWidth(autoWidth);
         return this;
     }
-
     public PlayerGridBuilder withSummonerNameColumn(boolean autoWidth, int flexGrow){
         playerGrid.addColumn(PlayerEntity::getSummonerName).setHeader("Summoner Name")
                 .setFlexGrow(flexGrow)
                 .setAutoWidth(autoWidth);
         return this;
     }
-
     public PlayerGridBuilder withPlayerNameColumn(boolean autoWidth, int flexGrow){
         playerGrid.addColumn(
                         new ComponentRenderer<>(Span::new, (span, player) -> {

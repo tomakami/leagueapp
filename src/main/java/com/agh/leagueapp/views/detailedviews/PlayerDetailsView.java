@@ -186,6 +186,7 @@ public class PlayerDetailsView
                                         (playerEntity.getTeamId(), playerEntity.getTeamId())));
 
         final Grid<GameEntity> gameGrid = gameGridBuilder.getGameGrid();
+
         gameGrid.getStyle().set("border", "1px solid grey");
 
         return new VerticalLayout(gameGrid);
